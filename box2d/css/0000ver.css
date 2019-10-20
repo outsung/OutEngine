@@ -1,0 +1,23 @@
+div{
+  border: 0px solid green;
+}
+
+body{
+  /*cursor:none;*/
+  /*cursor: url("./scope.png"), pointer;*/
+  margin: 0px;
+  overflow: hidden;
+}
+canvas{
+  border: 3px solid black;
+  position:absolute;
+  top:0;
+  left:0; 
+}
+
+#scene1{
+  visibility: hidden;
+}
+#scene2{
+  visibility: visible;
+}
