@@ -54,10 +54,10 @@ hUserscreen.addEventListener('mousedown', function(event){
   if ((event.button == 2) || (event.which == 3)) {
 
     let poly = new polygonShape;
-    let count = Math.floor(random(3, poly.MaxPolyVertexCount));
+    let count = Math.floor(4);
 
     let vertices = {};
-    let e = random(5,10);
+    let e = random(50,100);
 
     for(let i = 0; i < count; ++i){
       vertices[i] = new vector2(random(-e, e), random(-e, e));
@@ -137,7 +137,7 @@ polygonShape.prototype.draw = function(){
 
   //console.log("draw! poly");
 
-  ctx.strokeStyle = canvasColor(this.body.r, this.body.g, this.body.b, 0.5);
+  ctx.strokeStyle = canvasColor(this.body.r, this.body.g, this.body.b, 1);
   ctx.beginPath();
   let startDot = new vector2(0,0);
 
@@ -162,52 +162,54 @@ polygonShape.prototype.draw = function(){
 scene.prototype.render = function(){
   //console.log("scene render")
 
-
-
-  for(let i = 0; i < size(this.bodies); ++i)
-  {
+  for(let i = 0; i < size(this.bodies); ++i){
     let b = this.bodies[i];
     //console.log("shape draw");
     b.shape.draw();
   }
 
 
-  ctx.strokeStyle = canvasColor(200, 0, 0,0);
-  ctx.beginPath();
+  ctx.strokeStyle = canvasColor(200, 0, 0,1);
 
   for(let i = 0; i < size(this.contacts); ++i){
-
     //Manifold& m = this.contacts[i];
-
     for(let j = 0; j < this.contacts[i].contact_count; ++j){
       let c = new vector2(this.contacts[i].contacts[j].x,
-        this.contacts[i].contacts[j].y);
-        canvasDot(c.x, c.y, 4.0);
-      }
+                          this.contacts[i].contacts[j].y);
+      ctx.beginPath();
+      canvasDot(c.x, c.y, 4.0);
+      ctx.closePath();
+      ctx.stroke();
+
     }
-    ctx.closePath();
-    ctx.stroke();
+  }
 
 
-    ctx.strokeStyle = canvasColor(0, 200, 0);
+
+  ctx.strokeStyle = canvasColor(0, 200, 0,1);
+
+  for(let i = 0; i < size(this.contacts); ++i){
+    //Manifold& m = contacts[i];
     ctx.beginPath();
-    for(let i = 0; i < size(this.contacts); ++i){
-      //Manifold& m = contacts[i];
-      let n = new vector2(this.contacts[i].normal.x,
-                          this.contacts[i].normal.y);
-      for(let j = 0; j < this.contacts[i].contact_count; ++j){
-        let c = new vector2(this.contacts[i].contacts[j].x,
-                            this.contacts[i].contacts[j].y);
-        ctx.moveTo(c.x, c.y);
-        n.x *= 0.75;
-        n.y *= 0.75;
-        c.x += n.x;
-        c.y += n.y;
-        ctx.lineTo(c.x, c.y);
-      }
+    let n = new vector2(this.contacts[i].normal.x,
+                        this.contacts[i].normal.y);
+    for(let j = 0; j < this.contacts[i].contact_count; ++j){
+
+      let c = new vector2(this.contacts[i].contacts[j].x,
+                          this.contacts[i].contacts[j].y);
+
+      ctx.moveTo(c.x, c.y);
+      n.x *= 0.75;
+      n.y *= 0.75;
+      c.x += n.x;
+      c.y += n.y;
+      ctx.lineTo(c.x, c.y);
     }
+
     ctx.closePath();
     ctx.stroke();
+  }
+
 
 }
 

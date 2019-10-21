@@ -472,13 +472,13 @@ let body = function(shape, x, y){
   this.I = 1;
   this.iI = 1;
   //질량
-  this.m = 1;
-  this.im = 1;
+  this.m = 0.3;
+  this.im = 1 / 0.3;
 
   // 정적마찰,동적마찰
-  this.staticFriction = 0.5;
-  this.dynamicFriction = 0.3;
-  this.restitution = 0.2;
+  this.staticFriction = 0.8;
+  this.dynamicFriction = 0.5;
+  this.restitution = 0.05;
 
 
   // 색깔
@@ -517,15 +517,18 @@ body.prototype.setOrient = function(radians){
 
 body.prototype.integrateForces = function(dt){
 
-  if(this.im == 0.0)
+  if(this.im == 0.0){
     return;
+  }
 
   this.velocity.set(this.velocity.x + (this.force.x * this.im + gravity.x) * (dt / 2.0),
                     this.velocity.y + (this.force.y * this.im + gravity.y) * (dt / 2.0));
   this.angularVelocity += this.torque * this.iI * (dt / 2.0);
+  /*
   if(isNaN(this.angularVelocity)){
     let qweqwrqrqer = 0;
   }
+  */
   //console.log(this.velocity.x);
 }
 
@@ -546,7 +549,9 @@ body.prototype.integrateVelocity = function(dt){
 let manifold = function(a, b){
   this.A = a;
   this.B = b;
+  // 충돌량
   this.penetration = 0;
+  // 충돌 방향
   this.normal = new vector2(0,0);
   this.contacts = {
     0 : new vector2(0,0),
@@ -693,35 +698,36 @@ manifold.prototype.InfiniteMassCorrection = function(){
 //------------------------------------------------------------------------------ collision
 
 function Dispatch(typeA, typeB, m, A, B){
+  let newM = new Object;
   if(typeA == "eCircle"){
     if(typeB == "eCircle")
-      m = CircletoCircle(m, A, B);
+      newM = CircletoCircle(m, A, B);
     else if(typeB == "ePoly")
-      m = CircletoPolygon(m, A, B)
+      newM = CircletoPolygon(m, A, B);
   }
   else if(typeA == "ePoly"){
     if(typeB == "eCircle")
-      m = PolygontoCircle(m, A, B);
+      newM = PolygontoCircle(m, A, B);
     else if(typeB == "ePoly")
-      m = PolygontoPolygon(m, A, B);
+      newM = PolygontoPolygon(m, A, B);
   }
-  return m;
+  return newM;
 }
 
-// return m
+// return m ------------------------------------------------------CircletoCircle
 function CircletoCircle(m, a, b){
   let A = a.shape;
   let B = b.shape;
 
-  // Calculate translational vector, which is normal
+  // 법선 계산
   let normal = new vector2(b.position.x - a.position.x,
                           b.position.y - a.position.y);
 
   let dist_sqr = normal.lengthXX2();
   let radius = A.radius + B.radius;
 
-  // Not in contact
-  if(dist_sqr >= radius * radius){
+  // 충돌 하지 않음
+  if(dist_sqr >= (radius * radius)){
     m.contact_count = 0;
     return m;
   }
@@ -730,7 +736,8 @@ function CircletoCircle(m, a, b){
 
   m.contact_count = 1;
 
-  if(distance === 0.0){
+  // 똑같이 곂칠 때
+  if(distance == 0.0){
     m.penetration = A.radius;
     m.normal = new vector2(1, 0);
     m.contacts[0].x = a.position.x;
@@ -738,9 +745,10 @@ function CircletoCircle(m, a, b){
   }
   else{
     m.penetration = radius - distance;
-    // Faster than using Normalized since we already performed sqrt
+    // 노말라이즈
     m.normal = new vector2(normal.x / distance,
                           normal.y / distance);
+
     m.contacts[0].x = m.normal.x * A.radius + a.position.x;
     m.contacts[0].y = m.normal.y * A.radius + a.position.y;
   }
@@ -748,7 +756,7 @@ function CircletoCircle(m, a, b){
   return m;
 }
 
-// return m
+// return m -----------------------------------------------------CircletoPolygon
 function CircletoPolygon(m, a, b){
   // circle
   let A = a.shape;
@@ -848,7 +856,7 @@ function CircletoPolygon(m, a, b){
   return m;
 }
 
-// return m
+// return m------------------------------------------------------PolygontoCircle
 function PolygontoCircle(m, a, b){
   m = CircletoPolygon(m, b, a);
   m.normal.set(-m.normal.x, -m.normal.y);
@@ -965,7 +973,7 @@ function Clip(n, c, face){
   return {0:sp, 1:face};
 }
 
-// return m
+// return m ----------------------------------------------------PolygontoPolygon
 function PolygontoPolygon(m, a, b){
   // A,B = Polygon
   let A = a.shape;
@@ -1104,8 +1112,6 @@ function PolygontoPolygon(m, a, b){
 
 //------------------------------------------------------------------------------ scene
 
-let ASD = 0;
-
 let scene = function(dt, iterations){
   this.m_dt = dt;
   this.m_iterations = iterations;
@@ -1192,7 +1198,10 @@ scene.prototype.add = function(shape, x, y){
   return size(this.bodies)-1;
 }
 
-scene.prototype.clear = function(){};
+scene.prototype.clear = function(){
+  this.bodies = {};
+  this.contacts = {};
+};
 
 
 
