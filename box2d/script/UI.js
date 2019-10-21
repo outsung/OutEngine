@@ -199,8 +199,8 @@ scene.prototype.render = function(){
                           this.contacts[i].contacts[j].y);
 
       ctx.moveTo(c.x, c.y);
-      n.x *= 0.75;
-      n.y *= 0.75;
+      n.x *= 7.5;
+      n.y *= 7.5;
       c.x += n.x;
       c.y += n.y;
       ctx.lineTo(c.x, c.y);
@@ -218,35 +218,26 @@ scene.prototype.render = function(){
 /*
 // 글씨 쓰기
 function RenderString(x, y, s){
-
   glColor3f( 0.5f, 0.5f, 0.9f );
   glRasterPos2i( x, y );
-
   let l = s.length;
-
   for(let i = 0; i < l; ++i){
     glutBitmapCharacter( GLUT_BITMAP_9_BY_15, *(s + i) );
   }
 }
-
 void PhysicsLoop( void )
 {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
   RenderString( 1, 2, "Left click to spawn a polygon" );
   RenderString( 1, 4, "Right click to spawn a circle" );
-
   static double accumulator = 0;
-
   // Different time mechanisms for Linux and Windows
 #ifdef WIN32
   accumulator += g_Clock.Elapsed( );
 #else
   accumulator += g_Clock.Elapsed( ) / static_cast<double>(std::chrono::duration_cast<clock_freq>(std::chrono::seconds(1)).count());
 #endif
-
   g_Clock.Start( );
-
   accumulator = Clamp( 0.0f, 0.1f, accumulator );
   while(accumulator >= dt)
   {
@@ -262,11 +253,8 @@ void PhysicsLoop( void )
     }
     accumulator -= dt;
   }
-
   g_Clock.Stop( );
-
   scene.Render( );
-
   glutSwapBuffers( );
 }
 */
