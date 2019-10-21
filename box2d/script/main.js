@@ -13,7 +13,6 @@ main();
 function Mouse( int button, int state, int x, int y ){
   x /= 10.0f;
   y /= 10.0f;
-
   if(state == GLUT_DOWN)
     switch(button)
     {
@@ -42,7 +41,6 @@ function Mouse( int button, int state, int x, int y ){
       break;
     }
 }
-
 function Keyboard(unsigned char key, int x, int y){
   switch(key)
   {
