@@ -9,6 +9,8 @@ const PI =  3.141592741;
 const EPSILON = 0.0001;
 const FLT_MAX = Number.MAX_VALUE;
 
+
+//-----------------------------------------------------------------------vector2
 let vector2 = function(x,y){
   this.x = x;
   this.y = y;
@@ -53,6 +55,7 @@ vector2.prototype.multiplication = function(scalar){
   return new vector2(this.x * scalar, this.x * scalar);
 };
 
+//----------------------------------------------------------------------matrix22
 let matrix22 = function(m00,m01,m10,m11){
   this.m00 = m00;
   this.m01 = m01;
@@ -113,7 +116,7 @@ matrix22.prototype.multiplicationM = function(mat){
 };
 
 
-
+//----------------------------------------------------------------------function
 function minVV(vec1, vec2){
   return new vector2( Math.min( vec1.x, vec2.x ),
                       Math.min( vec1.y, vec2.y ));
@@ -142,7 +145,7 @@ function crossSV(scalar, vec){
   return new vector2(-scalar * vec.y, scalar * vec.x);
 }
 function crossVV(vec1, vec2){
-  return vec1.x * vec2.y - vec1.y * vec2.x;
+  return (vec1.x * vec2.y - vec1.y * vec2.x);
 }
 
 function equal(a, b){
@@ -171,6 +174,7 @@ function size(a){
   return Object.keys(a).length;
 }
 
+//--------------------------------------------------------------------------init
 const gravityScale = 5.0;
 const gravity = new vector2(0, 10.0 * gravityScale);
 const dt = 1.0 / 60.0;
@@ -225,7 +229,7 @@ shape.prototype.body = new Object;
 shape.prototype.radius = 0;
 
 
-
+//------------------------------------------------------------------------circle
 function circle(r){
   this.radius = r;
   this.type = "eCircle";
@@ -253,7 +257,7 @@ circle.prototype.getType = function(){
   return this.type;
 }
 
-
+//------------------------------------------------------------------polygonShape
 function polygonShape(){
   this.type = "ePoly";
   this.MaxPolyVertexCount = 64;
@@ -322,7 +326,7 @@ polygonShape.prototype.computeMass = function(density){
   this.body.m = density * area;
   this.body.im = (this.body.m) ? (1.0 /this.body.m) : 0.0;
   this.body.I = I * density;
-  this.body.iI = this.body.I ? (1.0 / this.body.I) : 0.0;
+  this.body.iI = (this.body.I) ? (1.0 / this.body.I) : 0.0;
 };
 polygonShape.prototype.setOrient = function(radians){
    this.u.setR(radians);
@@ -469,8 +473,8 @@ let body = function(shape, x, y){
   this.force = new vector2(0, 0);
 
   //관성
-  this.I = 1;
-  this.iI = 1;
+  this.I = 200;
+  this.iI = 1 / 200;
   //질량
   this.m = 0.3;
   this.im = 1 / 0.3;
@@ -498,7 +502,7 @@ body.prototype.applyImpulse = function(impulse, contactVector){
   this.velocity = new vector2(this.velocity.x + this.im * impulse.x,
                               this.velocity.y + this.im * impulse.y);
   this.angularVelocity += this.iI * crossVV(contactVector, impulse);
-  if(isNaN(this.angularVelocity)){
+  if(this.angularVelocity > 0){
     let qweqwrqrqer = 0;
   }
 };
@@ -517,6 +521,7 @@ body.prototype.setOrient = function(radians){
 
 body.prototype.integrateForces = function(dt){
 
+  //console.log(this.torque);
   if(this.im == 0.0){
     return;
   }
@@ -616,8 +621,9 @@ manifold.prototype.applyImpulse = function(){
     let contactVel = dotVV(rv, this.normal);
 
     // Do not resolve if velocities are separating
-    if(contactVel > 0)
+    if(contactVel > 0){
       return;
+    }
 
     let raCrossN = crossVV(ra, this.normal);
     let rbCrossN = crossVV(rb, this.normal);
@@ -654,17 +660,18 @@ manifold.prototype.applyImpulse = function(){
     jt /= this.contact_count;
 
     // Don't apply tiny friction impulses
-    if(equal(jt, 0.0))
+    if(equal(jt, 0.0)){
       return;
+    }
 
     // Coulumb's law
     let tangentImpulse = new vector2(0,0);
     if(Math.abs(jt) < (j * this.sf))
       tangentImpulse.set(t.x * jt, t.y * jt);
-    else
+    else{
       tangentImpulse.set(t.x * -j * this.df,
                         t.y * -j * this.df);
-
+    }
     // Apply friction impulse
     this.A.applyImpulse(new vector2(-tangentImpulse.x, -tangentImpulse.y), ra);
     this.B.applyImpulse( tangentImpulse, rb);
@@ -726,6 +733,7 @@ function CircletoCircle(m, a, b){
   let dist_sqr = normal.lengthXX2();
   let radius = A.radius + B.radius;
 
+
   // 충돌 하지 않음
   if(dist_sqr >= (radius * radius)){
     m.contact_count = 0;
@@ -739,7 +747,7 @@ function CircletoCircle(m, a, b){
   // 똑같이 곂칠 때
   if(distance == 0.0){
     m.penetration = A.radius;
-    m.normal = new vector2(1, 0);
+    m.normal = new vector2(1.0, 0.0);
     m.contacts[0].x = a.position.x;
     m.contacts[0].y = a.position.y;
   }
@@ -1116,7 +1124,7 @@ let scene = function(dt, iterations){
   this.m_dt = dt;
   this.m_iterations = iterations;
 
-  this.count = 0;
+  //this.count = 0;
 
   this.bodies = {};
 
@@ -1125,7 +1133,7 @@ let scene = function(dt, iterations){
 
 scene.prototype.step = function(){
   //console.log("z");
-  this.count++;
+  //this.count++;
   this.contacts = {};
 
   // 매니폴드 생성
@@ -1136,7 +1144,7 @@ scene.prototype.step = function(){
       let B = this.bodies[j];
       if((A.im == 0) && (B.im == 0))
         continue;
-      let m = new manifold(A, B);
+      let m = new manifold(B, A);
       m = m.solve();
       if(m.contact_count){
         //console.log(m.contact_count);
@@ -1171,15 +1179,20 @@ scene.prototype.step = function(){
     }
   }
 
-  // 속도에 따라 위치 변경
-  for(let i = 0; i < size(this.bodies); ++i){
-    this.bodies[i].integrateVelocity(this.m_dt);
-  }
+
 
   // 위치 보정
   for(let i = 0; i < size(this.contacts); ++i){
     this.contacts[i].positionalCorrection();
   }
+
+
+  // 속도에 따라 위치 변경
+  for(let i = 0; i < size(this.bodies); ++i){
+    this.bodies[i].integrateVelocity(this.m_dt);
+  }
+
+
 
   // Clear all forces
   for(let i = 0; i < size(this.bodies); ++i){
