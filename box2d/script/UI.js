@@ -1,86 +1,14 @@
-//------------------------------------------------------------------------------ init
-let buffers = {
-  0 : document.getElementById("buffer1"),
-  1 : document.getElementById("buffer2")
-}
-let drawingBuffer = 0;
-let ctx = buffers[drawingBuffer].getContext("2d");
-
-buffers[drawingBuffer].width = 800;
-buffers[drawingBuffer].height = 600;
-
-bufferFlip();
-buffers[drawingBuffer].width = 800;
-buffers[drawingBuffer].height = 600;
-
-
-function bufferFlip(){
-
-  buffers[1-drawingBuffer].style.visibility = 'hidden';
-  buffers[drawingBuffer].style.visibility = 'visible';
-
-  drawingBuffer = 1 - drawingBuffer;
-
-  ctx = buffers[drawingBuffer].getContext("2d");
-
-  ctx.clearRect(0, 0, 800, 600);
-}
-
-//------------------------------------------------------------------------------ HTML
-//let hScene = document.getElementById("scene");
+//------------------------------------------------------------------------------ define
+//--------------------------------------------------------------------------HTML
 let hUserscreen = document.getElementById("userscreen");
 
-let mouse = {
-  x : 0,
-  y : 0
-};
+let camera = {
+  position : new vector2(0, 0),
+  scale : 1.0
+}
 
-hUserscreen.addEventListener('mousemove', function(event){
-  //console.log("x : " + event.movementX + ", y : " + event.movementY);
-  //mapRotate(event.movementX);
-  mouse.x = event.offsetX;
-  mouse.y = event.offsetY;
-  //console.log(player.direction);
-});
-
-
-// 기본 우클릭 기능 중지
-document.addEventListener('contextmenu', function() {
-  event.preventDefault();
-});
-
-// 우클릭 시
-hUserscreen.addEventListener('mousedown', function(event){
-  if ((event.button == 2) || (event.which == 3)) {
-
-    let poly = new polygonShape;
-    let count = Math.floor(4);
-
-    let vertices = {};
-    let e = random(50,100);
-
-    for(let i = 0; i < count; ++i){
-      vertices[i] = new vector2(random(-e, e), random(-e, e));
-    }
-    console.log("A");
-    poly.set(vertices, count);
-    console.log("B");
-    let indexB = Scene.add(poly, mouse.x, mouse.y );
-    Scene.bodies[indexB].setOrient(random(-PI,PI));
-    Scene.bodies[indexB].restitution = 0.2;
-    Scene.bodies[indexB].dynamicFriction = 0.2;
-    Scene.bodies[indexB].staticFriction = 0.4;
-
-  }
-});
-
-// 클릭 시
-hUserscreen.addEventListener('click', function(event){
-
-  let c = new circle(random(10.0,30.0));
-  let b = Scene.add(c, mouse.x, mouse.y);
-});
-
+// material = Rock, Wood, Metal, BouncyBall, SuperBall, Pillow, Static
+let userMaterial = "SuperBall";
 
 
 function resize(){
@@ -95,18 +23,164 @@ function resize(){
   hUserScreen.style.height = window.innerHeight + "px";
 };
 
+//-----------------------------------------------------------------mouse
+// F = add ,del ,catch, enter, break;
+//
+let mouseFlist = {
+  F : "add",
+
+  add : {
+
+  }
+}
+
+
+let mouse = {
+  right : "",
+  left : "",
+  x : 0,
+  y : 0
+};
+
+// 기본 우클릭 기능 중지
+document.addEventListener('contextmenu', function() {
+  event.preventDefault();
+});
+
+
+hUserscreen.addEventListener('mousemove', function(event){
+  //console.log("x : " + event.movementX + ", y : " + event.movementY);
+  //mapRotate(event.movementX);
+  mouse.x = event.offsetX;
+  mouse.y = event.offsetY;
+  //console.log(player.direction);
+});
+
+
+
+// 우클릭 시
+hUserscreen.addEventListener('mousedown', function(event){
+  if ((event.button == 2) || (event.which == 3)) {
+
+
+    let poly = new polygonShape();
+    let count = random(3,64);
+
+    let vertices = {};
+    let e = random(50,100);
+
+    for(let i = 0; i < count; ++i){
+      vertices[i] = new vector2(random(-e, e), random(-e, e));
+    }
+    //console.log("A");
+    poly.set(vertices, count);
+    //console.log("B");
+    let indexB = Scene.add(poly, mouse.x, mouse.y );
+    Scene.bodies[indexB].setOrient(random(-PI,PI));
+    Scene.bodies[indexB].material = userMaterial;
+    Scene.bodies[indexB].initialize();
+    Scene.bodies[indexB].dynamicFriction = 0.2;
+    Scene.bodies[indexB].staticFriction = 0.4;
+
+  }
+});
+
+// 클릭 시
+hUserscreen.addEventListener('click', function(event){
+
+  let c = new circle(random(10.0,30.0));
+  let indexB = Scene.add(c, mouse.x, mouse.y);
+  // 기본
+  Scene.bodies[indexB].material = userMaterial;
+  Scene.bodies[indexB].initialize();
+});
+
+
+// 휠
+hUserscreen.addEventListener('mousewheel', function(delta){
+  let hCanvas1 = document.getElementsByTagName("canvas")[0];
+  let hCanvas2 = document.getElementsByTagName("canvas")[1];
+  if(delta.wheelDelta >= 0){
+    camera.scale += 0.05;
+    if(camera.scale >= 5.0)
+      camera.scale = 5.0;
+    hCanvas1.style.transform = "scale(" + camera.scale + ")";
+    hCanvas2.style.transform = "scale(" + camera.scale + ")";
+
+  }
+  else{
+    camera.scale -= 0.05;
+    if(camera.scale <= 0.1)
+      camera.scale = 0.1;
+    hCanvas1.style.transform = "scale(" + camera.scale + ")";
+    hCanvas2.style.transform = "scale(" + camera.scale + ")";
+  }
+});
+
+//--------------------------------------------------------------ketbord
+
+
+
+let keyCode = {
+  27 : false, //esc
+
+  87 : false, //w
+  65 : false, //a
+  83 : false, //s
+  68 : false, //d
+
+  84 : false, //t
+}
+
 function keyPress(){};
 function keyUp(){};
 
-//------------------------------------------------------------------------------ draw function
+
+
+//------------------------------------------------------------------------buffer
+let buffers = {
+  0 : document.getElementById("buffer1"),
+  1 : document.getElementById("buffer2")
+}
+
+let drawingBuffer = 0;
+
+let ctx = buffers[drawingBuffer].getContext("2d");
+
+function bufferInit(){
+  buffers[drawingBuffer].width = 8000;
+  buffers[drawingBuffer].height = 6000;
+  bufferFlip();
+  buffers[drawingBuffer].width = 8000;
+  buffers[drawingBuffer].height = 6000;
+}
+
+function bufferFlip(){
+
+  buffers[1-drawingBuffer].style.visibility = 'hidden';
+  buffers[drawingBuffer].style.visibility = 'visible';
+
+  drawingBuffer = 1 - drawingBuffer;
+
+  ctx = buffers[drawingBuffer].getContext("2d");
+
+  ctx.clearRect(0, 0, 8000, 6000);
+}
+
+
+//-------------------------------------------------------------------------Scene
+
+document.getElementById("log").innerHTML = "Material : " + userMaterial;
+
 function canvasColor(r,g,b,a){
   return "rgba("+ r +", "+ g +", "+ b +", "+ a +")";
 }
+
 function canvasDot(x,y,r){
   //console.log(x,y,r);
   ctx.arc(x, y, r, 0.5, PI * 3);
 }
-//------------------------------------------------------------------------------ Draw
+
 circle.prototype.draw = function(){
   //console.log("draw!");
   const k_segments = 20;
@@ -132,7 +206,6 @@ circle.prototype.draw = function(){
   ctx.closePath();
   ctx.stroke();
 };
-
 polygonShape.prototype.draw = function(){
 
   //console.log("draw! poly");
@@ -150,15 +223,35 @@ polygonShape.prototype.draw = function(){
       startDot.set(v.x, v.y);
       ctx.moveTo(v.x, v.y);
     }
-    else
+    else{
       ctx.lineTo(v.x, v.y);
+    }
+
   }
+
   ctx.lineTo(startDot.x, startDot.y);
   ctx.closePath();
   ctx.stroke();
 
-}
 
+  for(let i = 0; i < this.m_vertexCount; ++i){
+    ctx.beginPath();
+    let temp = this.u.multiplicationV(this.m_vertices[i]);
+    let v = new vector2(this.body.position.x + temp.x,
+                        this.body.position.y + temp.y);
+    //console.log(this.body.position.y+", "+temp.y);
+    if(i == 0){
+      canvasDot(v.x, v.y, 3);
+    }
+    else{
+      canvasDot(v.x, v.y, 2);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+  }
+
+}
 scene.prototype.render = function(){
   //console.log("scene render")
 
@@ -169,7 +262,7 @@ scene.prototype.render = function(){
   }
 
 
-  ctx.strokeStyle = canvasColor(200, 0, 0,1);
+  ctx.strokeStyle = canvasColor(200, 0, 0, 0.5);
 
   for(let i = 0; i < size(this.contacts); ++i){
     //Manifold& m = this.contacts[i];
@@ -177,7 +270,7 @@ scene.prototype.render = function(){
       let c = new vector2(this.contacts[i].contacts[j].x,
                           this.contacts[i].contacts[j].y);
       ctx.beginPath();
-      canvasDot(c.x, c.y, 4.0);
+      canvasDot(c.x, c.y, 3);
       ctx.closePath();
       ctx.stroke();
 
@@ -186,7 +279,7 @@ scene.prototype.render = function(){
 
 
 
-  ctx.strokeStyle = canvasColor(0, 200, 0,1);
+  ctx.strokeStyle = canvasColor(0, 200, 0, 0.5);
 
   for(let i = 0; i < size(this.contacts); ++i){
     //Manifold& m = contacts[i];
@@ -199,8 +292,8 @@ scene.prototype.render = function(){
                           this.contacts[i].contacts[j].y);
 
       ctx.moveTo(c.x, c.y);
-      n.x *= 7.5;
-      n.y *= 7.5;
+      n.x *= 4.5;
+      n.y *= 4.5;
       c.x += n.x;
       c.y += n.y;
       ctx.lineTo(c.x, c.y);
@@ -214,47 +307,8 @@ scene.prototype.render = function(){
 }
 
 
-//------------------------------------------------------------------------------
-/*
-// 글씨 쓰기
-function RenderString(x, y, s){
-  glColor3f( 0.5f, 0.5f, 0.9f );
-  glRasterPos2i( x, y );
-  let l = s.length;
-  for(let i = 0; i < l; ++i){
-    glutBitmapCharacter( GLUT_BITMAP_9_BY_15, *(s + i) );
-  }
-}
-void PhysicsLoop( void )
-{
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  RenderString( 1, 2, "Left click to spawn a polygon" );
-  RenderString( 1, 4, "Right click to spawn a circle" );
-  static double accumulator = 0;
-  // Different time mechanisms for Linux and Windows
-#ifdef WIN32
-  accumulator += g_Clock.Elapsed( );
-#else
-  accumulator += g_Clock.Elapsed( ) / static_cast<double>(std::chrono::duration_cast<clock_freq>(std::chrono::seconds(1)).count());
-#endif
-  g_Clock.Start( );
-  accumulator = Clamp( 0.0f, 0.1f, accumulator );
-  while(accumulator >= dt)
-  {
-    if(!frameStepping)
-      scene.Step( );
-    else
-    {
-      if(canStep)
-      {
-        scene.Step( );
-        canStep = false;
-      }
-    }
-    accumulator -= dt;
-  }
-  g_Clock.Stop( );
-  scene.Render( );
-  glutSwapBuffers( );
-}
-*/
+
+//------------------------------------------------------------------------------ define
+
+bufferInit();
+resize();

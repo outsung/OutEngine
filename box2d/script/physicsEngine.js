@@ -175,6 +175,43 @@ function size(a){
 }
 
 //--------------------------------------------------------------------------init
+const material = {
+  Rock : {
+    density : 0.6,
+    restitution : 0.1,
+    r : 84, g : 84, b : 84 // 어두운 회색
+  },
+  Wood : {
+    density : 0.3,
+    restitution : 0.2,
+    r : 255, g : 111, b : 28 //주황
+  },
+  Metal : {
+    density : 1.2,
+    restitution : 0.05,
+    r : 156, g : 156, b : 156 // 회색
+  },
+  BouncyBall : {
+    density : 0.3,
+    restitution : 0.8,
+    r : 119, g : 255, b : 91
+  },
+  SuperBall : {
+    density : 0.3,
+    restitution : 0.995,
+    r : 1, g : 65, b : 255
+  },
+  Pillow : {
+    density : 1.0,
+    restitution : 0.2,
+    r : 122, g : 155, b : 148
+  },
+  Static : {
+    density : 0.0,
+    restitution : 0.4,
+    r : 100, g : 205, b : 255
+  }
+};
 const gravityScale = 5.0;
 const gravity = new vector2(0, 10.0 * gravityScale);
 const dt = 1.0 / 60.0;
@@ -229,6 +266,7 @@ shape.prototype.body = new Object;
 shape.prototype.radius = 0;
 
 
+
 //------------------------------------------------------------------------circle
 function circle(r){
   this.radius = r;
@@ -243,12 +281,20 @@ circle.prototype.clone = function(){
   return new circle( this.radius );
 };
 circle.prototype.initialize = function(){
-  this.computeMass(1.0);
+  let density = material[this.body.material].density;
+  this.body.restitution = material[this.body.material].restitution;
+
+  this.body.r = material[this.body.material].r;
+  this.body.g = material[this.body.material].g;
+  this.body.b = material[this.body.material].b;
+
+  this.computeMass(density);
 };
 circle.prototype.computeMass = function(density){
-  this.body.m = PI * this.radius * this.radius * density;
+
+  this.body.m = PI * (this.radius * this.radius) * density;
   this.body.im = (this.body.m) ? (1.0 / this.body.m) : 0.0;
-  this.body.I = this.body.m * this.radius * this.radius;
+  this.body.I = this.body.m * (this.radius * this.radius);
   this.body.iI = (this.body.I) ? (1.0 / this.body.I) : 0.0;
 };
 circle.prototype.setOrient = function(radians){};
@@ -271,7 +317,14 @@ polygonShape.prototype = Object.create(shape.prototype);
 polygonShape.prototype.constructor = polygonShape;
 
 polygonShape.prototype.initialize = function(){
-  this.computeMass(1.0);
+  let density = material[this.body.material].density;
+  this.body.restitution = material[this.body.material].restitution;
+
+  this.body.r = material[this.body.material].r;
+  this.body.g = material[this.body.material].g;
+  this.body.b = material[this.body.material].b;
+
+  this.computeMass(density);
 };
 polygonShape.prototype.clone = function(){
   let poly = new polygonShape();
@@ -283,7 +336,8 @@ polygonShape.prototype.clone = function(){
   poly.m_vertexCount = this.m_vertexCount;
   return poly;
 };
-//중심 및 관성 계산
+
+//중심 및 관성 계산 밀도로
 polygonShape.prototype.computeMass = function(density){
   //중심
   let c = new vector2(0.0, 0.0);
@@ -297,7 +351,7 @@ polygonShape.prototype.computeMass = function(density){
 
     let p1 = new vector2(this.m_vertices[i1].x, this.m_vertices[i1].y);
 
-    let i2 = (i1 + 1 < this.m_vertexCount) ? i1 + 1 : 0;
+    let i2 = ( (i1 + 1) < this.m_vertexCount) ? (i1 + 1) : 0;
 
     let p2 = new vector2(this.m_vertices[i2].x, this.m_vertices[i2].y);
 
@@ -309,14 +363,14 @@ polygonShape.prototype.computeMass = function(density){
     c.x += triangleArea * k_inv3 * (p1.x + p2.x);
     c.y += triangleArea * k_inv3 * (p1.y + p2.y);
 
-    let intx2 = p1.x * p1.x + p2.x * p1.x + p2.x * p2.x;
-    let inty2 = p1.y * p1.y + p2.y * p1.y + p2.y * p2.y;
+    let intx2 = (p1.x * p1.x) + (p2.x * p1.x) + (p2.x * p2.x);
+    let inty2 = (p1.y * p1.y) + (p2.y * p1.y) + (p2.y * p2.y);
     I += (0.25 * k_inv3 * D) * (intx2 + inty2);
 
   }
 
-  c.x *= 1.0 / area;
-  c.y *= 1.0 / area;
+  c.x *= (1.0 / area);
+  c.y *= (1.0 / area);
 
   //모든 점을 중심을 기준으로 바꾸기
   for(let i = 0; i < this.m_vertexCount; ++i){
@@ -328,6 +382,7 @@ polygonShape.prototype.computeMass = function(density){
   this.body.I = I * density;
   this.body.iI = (this.body.I) ? (1.0 / this.body.I) : 0.0;
 };
+
 polygonShape.prototype.setOrient = function(radians){
    this.u.setR(radians);
 };
@@ -473,11 +528,13 @@ let body = function(shape, x, y){
   this.force = new vector2(0, 0);
 
   //관성
-  this.I = 200;
-  this.iI = 1 / 200;
+  this.I = 0.0;
+  this.iI = 0.0;
   //질량
-  this.m = 0.3;
-  this.im = 1 / 0.3;
+  this.m = 0.0;
+  this.im = 0.0;
+  // 재질
+  this.material = "Rock";
 
   // 정적마찰,동적마찰
   this.staticFriction = 0.8;
@@ -508,10 +565,15 @@ body.prototype.applyImpulse = function(impulse, contactVector){
 };
 
 body.prototype.setStatic = function(){
+  this.material = "Static";
+  this.shape.initialize();
   this.I = 0.0;
   this.iI = 0.0;
   this.m = 0.0;
   this.im = 0.0;
+};
+body.prototype.initialize = function(){
+  this.shape.initialize();
 };
 
 body.prototype.setOrient = function(radians){
@@ -526,8 +588,10 @@ body.prototype.integrateForces = function(dt){
     return;
   }
 
-  this.velocity.set(this.velocity.x + (this.force.x * this.im + gravity.x) * (dt / 2.0),
-                    this.velocity.y + (this.force.y * this.im + gravity.y) * (dt / 2.0));
+  this.velocity.set(this.velocity.x +
+            (this.force.x * this.im + gravity.x) * (dt / 2.0),
+                    this.velocity.y +
+            (this.force.y * this.im + gravity.y) * (dt / 2.0));
   this.angularVelocity += this.torque * this.iI * (dt / 2.0);
   /*
   if(isNaN(this.angularVelocity)){
@@ -680,19 +744,19 @@ manifold.prototype.applyImpulse = function(){
 }
 
 manifold.prototype.positionalCorrection = function(){
-  const k_slop = 0.05; // Penetration allowance
-  const percent = 0.4; // Penetration percentage to correct
+  const k_slop = 0.001; // Penetration 허용오차
+  const percent = 0.4; // Penetration 관통 비율
 
-  let temp = Math.max(this.penetration - k_slop, 0.0) / (this.A.im + this.B.im);
+  let temp = Math.max((this.penetration - k_slop), 0.0) / (this.A.im + this.B.im);
 
   let correction = new vector2(temp * this.normal.x * percent,
                               temp * this.normal.y * percent);
 
-  this.A.position = new vector2(this.A.position.x - correction.x * this.A.im,
-                                this.A.position.y - correction.y * this.A.im);
+  this.A.position = new vector2(this.A.position.x - (correction.x * this.A.im),
+                                this.A.position.y - (correction.y * this.A.im));
 
-  this.B.position = new vector2(this.B.position.x - correction.x * this.B.im,
-                                this.B.position.y - correction.y * this.B.im);
+  this.B.position = new vector2(this.B.position.x + (correction.x * this.B.im),
+                                this.B.position.y + (correction.y * this.B.im));
 
 }
 
@@ -816,12 +880,12 @@ function CircletoPolygon(m, a, b){
   let dot1 = dotVV(new vector2(center.x - v1.x, center.y - v1.y),
                   new vector2(v2.x - v1.x, v2.y - v1.y));
   let dot2 = dotVV(new vector2(center.x - v2.x, center.y - v2.y),
-                  new vector2(v1.x - v2.x, v1.x - v2.x));
+                  new vector2(v1.x - v2.x, v1.y - v2.y));
   m.penetration = A.radius - separation;
 
   // Closest to v1
   if(dot1 <= 0.0){
-    if(distsqrVV(center, v1) > A.radius * A.radius)
+    if(distsqrVV(center, v1) > (A.radius * A.radius))
       return m;
 
     m.contact_count = 1;
@@ -834,7 +898,7 @@ function CircletoPolygon(m, a, b){
     m.contacts[0] = v1;
   }
   else if(dot2 <= 0.0){ // Closest to v2
-    if(distsqrVV(center, v2) > A.radius * A.radius)
+    if(distsqrVV(center, v2) > (A.radius * A.radius))
       return m;
 
     m.contact_count = 1;
@@ -876,7 +940,7 @@ function FindAxisLeastPenetration(A, B){
   // A, B = Polygon
 
   let bestDistance = -FLT_MAX;
-  let bestIndex = -1;
+  let bestIndex;
 
   for(let i = 0; i < A.m_vertexCount; ++i){
     // Retrieve a face normal from A
@@ -894,8 +958,12 @@ function FindAxisLeastPenetration(A, B){
     // Retrieve vertex on face from A, transform into
     // B's model space
     let v = new vector2(A.m_vertices[i].x, A.m_vertices[i].y);
-    v = A.u.multiplicationV(new vector2(v.x + A.body.position.x,
-                                        v.y + A.body.position.y));
+
+    let temp = A.u.multiplicationV(v);
+
+    v = new vector2(temp.x + A.body.position.x,
+                    temp.y + A.body.position.y);
+
     v.set(v.x - B.body.position.x, v.y - B.body.position.y);
     v = buT.multiplicationV(v);
 
@@ -903,7 +971,7 @@ function FindAxisLeastPenetration(A, B){
     let d = dotVV(n, new vector2(s.x - v.x, s.y - v.y));
 
     // Store greatest distance
-    if((d > bestDistance)){
+    if(d > bestDistance){
       bestDistance = d;
       bestIndex = i;
     }
@@ -919,9 +987,12 @@ function FindIncidentFace(v, RefPoly, IncPoly, referenceIndex){
   let referenceNormal = new vector2(RefPoly.m_normals[referenceIndex].x,
                                     RefPoly.m_normals[referenceIndex].y);
 
+  let temp = 0;
   // Calculate normal in incident's frame of reference
-  referenceNormal.set(RefPoly.u.multiplicationV(referenceNormal)); // To world space
-  referenceNormal.set(IncPoly.u.transpose().multiplicationV(referenceNormal)); // To incident's model space
+  temp = RefPoly.u.multiplicationV(referenceNormal);
+  referenceNormal.set(temp.x, temp.y); // To world space
+  temp = IncPoly.u.transpose().multiplicationV(referenceNormal);
+  referenceNormal.set(temp.x, temp.y); // To incident's model space
 
   // Find most anti-normal face on incident polygon
   let incidentFace = 0;
@@ -935,10 +1006,17 @@ function FindIncidentFace(v, RefPoly, IncPoly, referenceIndex){
   }
 
   // Assign face vertices for incidentFace
-  let temp = IncPoly.u.multiplicationV(IncPoly.m_vertices[incidentFace]);
+  temp = IncPoly.u.multiplicationV(IncPoly.m_vertices[incidentFace]);
   v[0].set(temp.x + IncPoly.body.position.x,
           temp.y + IncPoly.body.position.y);
-  incidentFace = (incidentFace + 1 >= Math.floor(IncPoly.m_vertexCount)) ? 0 : (incidentFace + 1);
+
+  if( (incidentFace + 1) >= Math.floor(IncPoly.m_vertexCount) ){
+    incidentFace = 0;
+  }
+  else{
+    incidentFace = incidentFace + 1;
+  }
+
   temp = IncPoly.u.multiplicationV(IncPoly.m_vertices[incidentFace]);
   v[1].set(temp.x + IncPoly.body.position.x,
           temp.y + IncPoly.body.position.y);
@@ -995,17 +1073,20 @@ function PolygontoPolygon(m, a, b){
   temp = FindAxisLeastPenetration(A, B);
   faceA = temp[0];
   let penetrationA = temp[1];
-  if(penetrationA >= 0.0)
+  if(penetrationA >= 0.0){
+    //console.log("0x");
     return m;
+  }
 
   // Check for a separating axis with B's face planes
   let faceB;
   temp = FindAxisLeastPenetration(B, A);
-  faceB = temp[0]
-  let penetrationB = temp[1]
-  if(penetrationB >= 0.0)
+  faceB = temp[0];
+  let penetrationB = temp[1];
+  if(penetrationB >= 0.0){
+    console.log("1x");
     return m;
-
+  }
   let referenceIndex;
   let flip; // Always point from a to b
 
@@ -1014,22 +1095,22 @@ function PolygontoPolygon(m, a, b){
 
   // Determine which shape contains reference face
   if(biasGreaterThan(penetrationA, penetrationB)){
-    RefPoly = A;
-    IncPoly = B;
+    RefPoly = a.shape;
+    IncPoly = b.shape;
     referenceIndex = faceA;
     flip = false;
   }
   else{
-    RefPoly = B;
-    IncPoly = A;
+    RefPoly = b.shape;
+    IncPoly = a.shape;
     referenceIndex = faceB;
     flip = true;
   }
 
   // World space incident face
   let incidentFace = {
-    0 : new vector2(0,0),
-    1 : new vector2(0,0)
+    0 : new vector2(0.0,0.0),
+    1 : new vector2(0.0,0.0)
   };
   incidentFace = FindIncidentFace(incidentFace, RefPoly, IncPoly, referenceIndex);
 
@@ -1049,7 +1130,14 @@ function PolygontoPolygon(m, a, b){
   // Setup reference face vertices
   let v1 = new vector2(RefPoly.m_vertices[referenceIndex].x,
                       RefPoly.m_vertices[referenceIndex].y);
-  referenceIndex = (referenceIndex + 1 == RefPoly.m_vertexCount) ? 0 : (referenceIndex + 1);
+
+  if((referenceIndex + 1) == RefPoly.m_vertexCount){
+    referenceIndex = 0;
+  }
+  else{
+    referenceIndex = referenceIndex + 1;
+  }
+
   let v2 = new vector2(RefPoly.m_vertices[referenceIndex].x,
                       RefPoly.m_vertices[referenceIndex].y);
 
@@ -1079,14 +1167,16 @@ function PolygontoPolygon(m, a, b){
   // Clip incident face to reference face side planes
   temp = Clip(new vector2(-sidePlaneNormal.x, -sidePlaneNormal.y), negSide, incidentFace);
   incidentFace = temp[1];
-  if(temp[0] < 2)
+  if(temp[0] < 2){
+    console.log("2x");
     return m; // Due to floating point error, possible to not have required points
-
+  }
   temp = Clip(sidePlaneNormal, posSide, incidentFace);
   incidentFace = temp[1];
-  if(temp[0] < 2)
+  if(temp[0] < 2){
+    console.log("3x");
     return m; // Due to floating point error, possible to not have required points
-
+  }
   // Flip
   m.normal = flip ? new vector2(-refFaceNormal.x, -refFaceNormal.y) : refFaceNormal;
 
@@ -1094,7 +1184,7 @@ function PolygontoPolygon(m, a, b){
   let cp = 0; // clipped points behind reference face
   let separation = dotVV(refFaceNormal, incidentFace[0]) - refC;
 
-  if(separation <= 0){
+  if(separation <= 0.0){
     m.contacts[cp] = incidentFace[0];
     m.penetration = -separation;
     ++cp;
@@ -1109,9 +1199,10 @@ function PolygontoPolygon(m, a, b){
     ++cp;
 
     // Average penetration
-    m.penetration /= (cp * 1.0);
+    m.penetration /= cp;
   }
 
+  console.log(cp);
   m.contact_count = cp;
 
   return m;
@@ -1144,7 +1235,7 @@ scene.prototype.step = function(){
       let B = this.bodies[j];
       if((A.im == 0) && (B.im == 0))
         continue;
-      let m = new manifold(B, A);
+      let m = new manifold(A, B);
       m = m.solve();
       if(m.contact_count){
         //console.log(m.contact_count);
@@ -1161,8 +1252,6 @@ scene.prototype.step = function(){
     this.bodies[i].integrateForces(this.m_dt);
     /*
     if(i == 2){
-      document.getElementById("log").innerHTML = "bodies : " + this.bodies[2].velocity.y +
-                                                  " / contacts : " + Scene.contacts[0];
     }
     */
   }
@@ -1183,6 +1272,7 @@ scene.prototype.step = function(){
 
   // 위치 보정
   for(let i = 0; i < size(this.contacts); ++i){
+    //error
     this.contacts[i].positionalCorrection();
   }
 
