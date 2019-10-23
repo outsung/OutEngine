@@ -1,0 +1,70 @@
+
+
+div{
+  border: 0px solid green;
+}
+
+body{
+  /*cursor:none;*/
+  /*cursor: url("./scope.png"), pointer;*/
+  margin: 0px;
+  overflow: hidden;
+}
+/*
+.view{
+  width:1200px;
+  height:400px;
+  position: absolute;
+  border:3px solid red;
+  overflow: hidden;
+}
+/*
+.view .scroll{
+  width: 10000px;
+  height: 310px;
+  background-color: green;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+*/
+/*
+.scroll{
+  /*visibility: hidden;
+  width: 1200px;
+  height: 300px;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+
+}
+
+.scroll div{
+  display: inline-block;
+
+  width: 400px;
+  height: 300px;
+  background-color: yellow;
+}
+*/
+#userscreen{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+canvas{
+  border: 3px solid black;
+  position: absolute;
+  margin-left: 100px;
+  margin-top: 100px;
+}
+
+#scene1{
+  visibility: hidden;
+  transform: scale(1.0);
+}
+#scene2{
+  visibility: visible;
+  transform: scale(1.0);
+}

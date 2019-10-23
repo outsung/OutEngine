@@ -1,0 +1,33 @@
+*{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.veiw{
+  position: absolute;
+  width: 1200px;
+  height: 300px;
+  border:1px solid red;
+  overflow: hidden;
+}
+.scroll{
+  width: 1200px;
+  height: 330px;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+
+}
+
+.scroll div{
+  display: inline-block;
+
+  width: 400px;
+  height: 300px;
+  background-color: yellow;
+}

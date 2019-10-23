@@ -1,6 +1,11 @@
 //------------------------------------------------------------------------------ define
 //--------------------------------------------------------------------------HTML
 let hUserscreen = document.getElementById("userscreen");
+//let hScroll = document.getElementsByClassName("scroll")[0];
+
+//"title ? char ? play ?
+//let check = "title";
+
 
 let camera = {
   position : new vector2(0, 0),
@@ -43,7 +48,7 @@ let mouse = {
 };
 
 // 기본 우클릭 기능 중지
-document.addEventListener('contextmenu', function() {
+document.addEventListener('contextmenu', function(){
   event.preventDefault();
 });
 
@@ -97,7 +102,9 @@ hUserscreen.addEventListener('click', function(event){
 
 
 // 휠
+
 hUserscreen.addEventListener('mousewheel', function(delta){
+
   let hCanvas1 = document.getElementsByTagName("canvas")[0];
   let hCanvas2 = document.getElementsByTagName("canvas")[1];
   if(delta.wheelDelta >= 0){
@@ -117,6 +124,16 @@ hUserscreen.addEventListener('mousewheel', function(delta){
   }
 });
 
+//캐릭터 휠
+/*
+hScroll.addEventListener('mousewheel', function(delta){
+  console.log("mousewheel");
+  delta = window.event || delta;
+  delta.preventDefault();
+  document.hScroll.scrollLeft -= (delta.wheelDelta || -delta.detail);
+});
+
+*/
 //--------------------------------------------------------------ketbord
 
 
@@ -147,13 +164,15 @@ let drawingBuffer = 0;
 
 let ctx = buffers[drawingBuffer].getContext("2d");
 
+
 function bufferInit(){
-  buffers[drawingBuffer].width = 8000;
-  buffers[drawingBuffer].height = 6000;
+  buffers[drawingBuffer].width = 800;
+  buffers[drawingBuffer].height = 600;
   bufferFlip();
-  buffers[drawingBuffer].width = 8000;
-  buffers[drawingBuffer].height = 6000;
+  buffers[drawingBuffer].width = 800;
+  buffers[drawingBuffer].height = 600;
 }
+
 
 function bufferFlip(){
 
@@ -164,8 +183,9 @@ function bufferFlip(){
 
   ctx = buffers[drawingBuffer].getContext("2d");
 
-  ctx.clearRect(0, 0, 8000, 6000);
+  ctx.clearRect(0, 0, 800, 600);
 }
+
 
 
 //-------------------------------------------------------------------------Scene
@@ -308,7 +328,7 @@ scene.prototype.render = function(){
 
 
 
-//------------------------------------------------------------------------------ define
+//------------------------------------------------------------------------------ init
 
 bufferInit();
 resize();
