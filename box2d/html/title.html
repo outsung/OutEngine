@@ -5,38 +5,26 @@
     <title>title</title>
     <link rel="stylesheet" href="../css/title.css">
   </head>
-  <body onresize="resize()">
+  <body>
+  <div id="black"></div>
 
-    <!-- 캐릭터 설정 -->
+  <div id="title"><img src="../image/title.png"></div>
+  <div id="titlemenu"><img src="../image/titlemenu.png"></div>
+  <!-- 캐릭터 설정  <img src="../image/title.png"> -->
+  <div id="charmenu">
+    <div id="charmenux"><img src="../image/x.png"></div>
+  </div>
   <div class="veiw">
     <div class="scroll">
-      <div><img src=""></div>
-      <div>2</div>
-      <div>3</div>
-      <div>4</div>
+      <div><img src="../image/red.png"></div>
+      <div><img src="../image/blue.png"></div>
+      <div><img src="../image/green.png"></div>
+      <div><img src="../image/orange.png"></div>
     </div>
+    <div id="scrollbuttonR"><img src="../image/scrollbuttonR.png"></div>
+    <div id="scrollbuttonL"><img src="../image/scrollbuttonL.png"></div>
   </div>
-  <script type="text/javascript">
-    let hScroll = document.getElementsByClassName("scroll")[0];
-    hScroll.addEventListener("mousewheel", function(delta){
-      console.log("a");
-      delta = window.event || delta;
-      delta.preventDefault();
-      let i = 0;
-      let wheelAnimation = setInterval(function(){
-        console.log("z");
-        if(i <= 50){
-          hScroll.scrollLeft -= (delta.wheelDelta || -delta.detail) / 50;
-          i++;
-        }
-        else{
-          clearInterval(wheelAnimation);
-        }
 
-      },1);
-
-    });
-
-  </script>
+  <script type="text/javascript" src="../script/title.js"></script>
   </body>
 </html>
