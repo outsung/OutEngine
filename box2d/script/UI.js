@@ -1,14 +1,26 @@
 //------------------------------------------------------------------------------ define
 //--------------------------------------------------------------------------HTML
 let hUserscreen = document.getElementById("userscreen");
+let hBuffer = document.getElementById("buffer");
 //let hScroll = document.getElementsByClassName("scroll")[0];
+
+let buffers = {
+  0 : document.getElementById("buffer1"),
+  1 : document.getElementById("buffer2")
+}
+
 
 //"title ? char ? play ?
 //let check = "title";
 
+const width = 2000;
+const height = 2000;
 
 let camera = {
-  position : new vector2(0, 0),
+  position : {
+    x : 0,
+    y : 0
+  },
   scale : 1.0
 }
 
@@ -23,26 +35,35 @@ function resize(){
 
   //userScreen.width = window.innerWidth;
   //userScreen.height = window.innerHeight;
+  buffers[0].style.marginLeft = (window.innerWidth / 2) - camera.position.x + "px";
+  buffers[0].style.marginTop = (window.innerHeight / 2) - camera.position.y + "px";
+
+  buffers[1].style.marginLeft = (window.innerWidth / 2) - camera.position.x + "px";
+  buffers[1].style.marginTop = (window.innerHeight / 2) - camera.position.y + "px";
+
+  hBuffer.style.marginLeft = (window.innerWidth / 2) - camera.position.x + "px";
+  hBuffer.style.marginTop = (window.innerHeight / 2) - camera.position.y + "px";
 
   hUserScreen.style.width = window.innerWidth + "px";
   hUserScreen.style.height = window.innerHeight + "px";
 };
 
 //-----------------------------------------------------------------mouse
-// F = add ,del ,catch, enter, break;
+// F = add ,del ,catch, enter, break, move
 //
 let mouseFlist = {
-  F : "add",
-
-  add : {
-
-  }
+  "add" : 0,
+  "del" : 1,
+  "catch" : 2,
+  "enter" : 3,
+  "break" : 4,
+  "move" : 5
 }
 
 
+//
 let mouse = {
-  right : "",
-  left : "",
+  f : "add",
   x : 0,
   y : 0
 };
@@ -64,7 +85,7 @@ hUserscreen.addEventListener('mousemove', function(event){
 
 
 // 우클릭 시
-hUserscreen.addEventListener('mousedown', function(event){
+hBuffer.addEventListener('mousedown', function(event){
   if ((event.button == 2) || (event.which == 3)) {
 
 
@@ -91,36 +112,67 @@ hUserscreen.addEventListener('mousedown', function(event){
 });
 
 // 클릭 시
-hUserscreen.addEventListener('click', function(event){
+hBuffer.addEventListener('click', function(event){
+  switch (mouseFlist[mouse.f]) {
+    case 0:
+      // add
 
-  let c = new circle(random(10.0,30.0));
-  let indexB = Scene.add(c, mouse.x, mouse.y);
-  // 기본
-  Scene.bodies[indexB].material = userMaterial;
-  Scene.bodies[indexB].initialize();
+      let c = new circle(random(10.0,30.0));
+      let indexB = Scene.add(c, mouse.x, mouse.y);
+      // 기본
+      Scene.bodies[indexB].material = userMaterial;
+      Scene.bodies[indexB].initialize();
+      break;
+    case 1:
+      //del
+
+      break;
+    case 2:
+      //catch
+
+      break;
+    case 3:
+      //enter
+
+      break;
+    case 4:
+      //break
+
+      break;
+    case 5:
+      //move
+
+      break;
+    default:
+
+  }
+
 });
-
 
 // 휠
 
 hUserscreen.addEventListener('mousewheel', function(delta){
 
-  let hCanvas1 = document.getElementsByTagName("canvas")[0];
-  let hCanvas2 = document.getElementsByTagName("canvas")[1];
+  buffers[0].style.transformOrigin = camera.position.x + " " + camera.position.y;
+  buffers[1].style.transformOrigin = camera.position.x + " " + camera.position.y;
+
+  hBuffer.style.transformOrigin = camera.position.x + " " + camera.position.y;
+
   if(delta.wheelDelta >= 0){
     camera.scale += 0.05;
     if(camera.scale >= 5.0)
       camera.scale = 5.0;
-    hCanvas1.style.transform = "scale(" + camera.scale + ")";
-    hCanvas2.style.transform = "scale(" + camera.scale + ")";
-
+    buffers[0].style.transform = "scale(" + camera.scale + ")";
+    buffers[1].style.transform = "scale(" + camera.scale + ")";
+    hBuffer.style.transform = "scale(" + camera.scale + ")";
   }
   else{
     camera.scale -= 0.05;
     if(camera.scale <= 0.1)
       camera.scale = 0.1;
-    hCanvas1.style.transform = "scale(" + camera.scale + ")";
-    hCanvas2.style.transform = "scale(" + camera.scale + ")";
+    buffers[0].style.transform = "scale(" + camera.scale + ")";
+    buffers[1].style.transform = "scale(" + camera.scale + ")";
+    hBuffer.style.transform = "scale(" + camera.scale + ")";
   }
 });
 
@@ -155,10 +207,8 @@ function keyUp(){};
 
 
 //------------------------------------------------------------------------buffer
-let buffers = {
-  0 : document.getElementById("buffer1"),
-  1 : document.getElementById("buffer2")
-}
+
+
 
 let drawingBuffer = 0;
 
@@ -166,31 +216,37 @@ let ctx = buffers[drawingBuffer].getContext("2d");
 
 
 function bufferInit(){
-  buffers[drawingBuffer].width = 800;
-  buffers[drawingBuffer].height = 600;
+  hBuffer.style.width = width + "px";
+  hBuffer.style.height = height + "px";
+
+  buffers[drawingBuffer].width = width;
+  buffers[drawingBuffer].height = height;
   bufferFlip();
-  buffers[drawingBuffer].width = 800;
-  buffers[drawingBuffer].height = 600;
+  buffers[drawingBuffer].width = width;
+  buffers[drawingBuffer].height = height;
 }
 
 
 function bufferFlip(){
 
   buffers[1-drawingBuffer].style.visibility = 'hidden';
+  buffers[1-drawingBuffer].style.zIndex = 0;
+
   buffers[drawingBuffer].style.visibility = 'visible';
+  buffers[drawingBuffer].style.zIndex = 1;
 
   drawingBuffer = 1 - drawingBuffer;
 
   ctx = buffers[drawingBuffer].getContext("2d");
 
-  ctx.clearRect(0, 0, 800, 600);
+  ctx.clearRect(0, 0, width, height);
 }
 
 
 
 //-------------------------------------------------------------------------Scene
 
-document.getElementById("log").innerHTML = "Material : " + userMaterial;
+//document.getElementById("log").innerHTML = "Material : " + userMaterial;
 
 function canvasColor(r,g,b,a){
   return "rgba("+ r +", "+ g +", "+ b +", "+ a +")";

@@ -63,11 +63,20 @@ canvas{
   margin-top: 100px;
 }
 
+#buffer{
+  z-index: 4;
+  position: absolute;
+  margin-left: 100px;
+  margin-top: 100px;
+}
+
 #scene1{
   visibility: hidden;
+  transform-origin: 0 0;
   transform: scale(1.0);
 }
 #scene2{
   visibility: visible;
+  transform-origin: 0 0;
   transform: scale(1.0);
 }

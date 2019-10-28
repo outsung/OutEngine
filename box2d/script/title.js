@@ -3,7 +3,6 @@ let hVeiw = document.getElementsByClassName("veiw")[0];
 let hTitlemenu = document.getElementById("titlemenu");
 let hBlack = document.getElementById("black");
 let hCharmenu = document.getElementById("charmenu");
-let hCharmenux = document.getElementById("charmenux");
 
 hTitlemenu.addEventListener("click", function(){
   hVeiw.style.visibility = "visible";
@@ -96,3 +95,13 @@ for(let i = 0; i < 4; i++){
 
   });
 }
+
+
+
+let hCharmenux = document.getElementById("charmenux");
+hCharmenux.addEventListener("click", function(){
+  hVeiw.style.visibility = "hidden";
+  hBlack.style.visibility = "hidden";
+  hCharmenu.style.visibility = "hidden";
+
+});
