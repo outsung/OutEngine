@@ -866,6 +866,7 @@ function CircletoPolygon(m, a, b){
 
   //중심이 다각형 안에 있는지 확인
   if(separation < EPSILON){
+    //console.log("z");
     m.contact_count = 1;
     let temp = B.u.multiplicationV(B.m_normals[faceNormal]);
     m.normal = new vector2(-temp.x, -temp.y);
@@ -1208,6 +1209,53 @@ function PolygontoPolygon(m, a, b){
   return m;
 }
 
+function PolygontoPoint(a, b){
+  A = a.shape;
+  B = b;
+
+  let center = new vector2(b.x, b.y);
+  center = A.u.transpose().multiplicationV(new vector2(center.x - a.position.x,
+                                                      center.y - a.position.y));
+
+  let separation = -FLT_MAX;
+  for(let i = 0; i < A.m_vertexCount; ++i){
+    let s = dotVV(A.m_normals[i], new vector2(center.x - A.m_vertices[i].x,
+                                            center.y - A.m_vertices[i].y));
+    if(s > EPSILON){
+      return false;
+    }
+
+    if(s > separation){
+      separation = s;
+    }
+  }
+  if(separation < EPSILON){
+    return true;
+  }
+
+}
+
+function CircletoPoint(a, b){
+  A = a.shape;
+  B = b;
+
+  // 법선 계산
+  let normal = new vector2(b.x - a.position.x,
+                          b.y - a.position.y);
+
+  let dist_sqr = normal.lengthXX2();
+  let radius = A.radius;
+
+  if(dist_sqr >= (radius * radius)){
+    return false;
+  }
+  else{
+    return true;
+  }
+
+
+
+}
 
 //------------------------------------------------------------------------------ scene
 
@@ -1216,6 +1264,7 @@ let scene = function(dt, iterations){
   this.m_iterations = iterations;
 
   //this.count = 0;
+  this.delete = [];
 
   this.bodies = {};
 
@@ -1289,6 +1338,17 @@ scene.prototype.step = function(){
     this.bodies[i].force.set(0, 0);
     this.bodies[i].torque = 0;
   }
+
+  // bodies delete
+  let temp = {};
+  for(let i = 0; i < size(this.bodies); ++i){
+    if(this.delete.indexOf(i) == -1){
+      temp[size(temp)] = this.bodies[i];
+    }
+  }
+  this.delete = [];
+  this.bodies = temp;
+
 }
 
 scene.prototype.render = function(){};
@@ -1304,6 +1364,7 @@ scene.prototype.add = function(shape, x, y){
 scene.prototype.clear = function(){
   this.bodies = {};
   this.contacts = {};
+  this.delete = [];
 };
 
 

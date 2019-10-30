@@ -63,10 +63,13 @@ let mouseFlist = {
 
 //
 let mouse = {
-  f : "add",
+  f : "catch",
+  c : -1,
+  m : 0,
   x : 0,
   y : 0
 };
+
 
 // 기본 우클릭 기능 중지
 document.addEventListener('contextmenu', function(){
@@ -79,73 +82,149 @@ hUserscreen.addEventListener('mousemove', function(event){
   //mapRotate(event.movementX);
   mouse.x = event.offsetX;
   mouse.y = event.offsetY;
+  if(mouse.c != -1){
+    let mouseForce = new vector2(Scene.bodies[mouse.c].position.x - mouse.x,
+                                Scene.bodies[mouse.c].position.y - mouse.y);
+    console.log(mouseForce);
+
+    Scene.bodies[mouse.c].force = mouseForce;
+
+  }
   //console.log(player.direction);
 });
 
 
 
-// 우클릭 시
+// 마우스 다운
 hBuffer.addEventListener('mousedown', function(event){
-  if ((event.button == 2) || (event.which == 3)) {
+  // 우클릭시
+  if((event.button == 2) || (event.which == 3)){
+    switch (mouseFlist[mouse.f]){
+      case 0: // add
+        let poly = new polygonShape();
+        let count = random(3,64);
 
+        let vertices = {};
+        let e = random(50,100);
 
-    let poly = new polygonShape();
-    let count = random(3,64);
+        for(let i = 0; i < count; ++i){
+          vertices[i] = new vector2(random(-e, e), random(-e, e));
+        }
+        //console.log("A");
+        poly.set(vertices, count);
+        //console.log("B");
+        let indexB = Scene.add(poly, mouse.x, mouse.y );
+        Scene.bodies[indexB].setOrient(random(-PI,PI));
+        Scene.bodies[indexB].material = userMaterial;
+        Scene.bodies[indexB].initialize();
+        Scene.bodies[indexB].dynamicFriction = 0.2;
+        Scene.bodies[indexB].staticFriction = 0.4;
+        break;
+      case 1: //del
+        Scene.clear();
 
-    let vertices = {};
-    let e = random(50,100);
+        break;
+      case 2: //catch
+        mouse.c = -1;
+        break;
+      case 3: //enter
 
-    for(let i = 0; i < count; ++i){
-      vertices[i] = new vector2(random(-e, e), random(-e, e));
+        break;
+      case 4: //break
+
+        break;
+      case 5: //move
+        //원점으로
+        break;
+      default:
     }
-    //console.log("A");
-    poly.set(vertices, count);
-    //console.log("B");
-    let indexB = Scene.add(poly, mouse.x, mouse.y );
-    Scene.bodies[indexB].setOrient(random(-PI,PI));
-    Scene.bodies[indexB].material = userMaterial;
-    Scene.bodies[indexB].initialize();
-    Scene.bodies[indexB].dynamicFriction = 0.2;
-    Scene.bodies[indexB].staticFriction = 0.4;
+  }
+  else if((event.button == 0) || (event.which == 1)){
+    switch (mouseFlist[mouse.f]){
+      case 0: // add
+        let c = new circle(random(10.0,30.0));
+        let indexB = Scene.add(c, mouse.x, mouse.y);
+        Scene.bodies[indexB].material = userMaterial;
+        Scene.bodies[indexB].initialize();
+        break;
+      case 1: //del
+        for(let i = 0; i < size(Scene.bodies); ++i){
+          let typeA = Scene.bodies[i].shape.getType();
+          if(typeA == "ePoly"){
+            if(PolygontoPoint(Scene.bodies[i], new vector2(mouse.x, mouse.y))){
+              console.log("ePoly delete");
+              Scene.delete.push(i);
+              break;
+            }
+          }
+          else if(typeA == "eCircle"){
+            if(CircletoPoint(Scene.bodies[i], new vector2(mouse.x, mouse.y))){
+              console.log("eCircle delete");
+              Scene.delete.push(i);
+              break;
+            }
+          }
 
+        }
+        break;
+      case 2: //catch
+        for(let i = 0; i < size(Scene.bodies); ++i){
+          let typeA = Scene.bodies[i].shape.getType();
+          if(typeA == "ePoly"){
+            if(PolygontoPoint(Scene.bodies[i], new vector2(mouse.x, mouse.y))){
+              console.log("ePoly catch");
+              mouse.c = i;
+              break;
+            }
+          }
+          else if(typeA == "eCircle"){
+            if(CircletoPoint(Scene.bodies[i], new vector2(mouse.x, mouse.y))){
+              console.log("eCircle catch");
+              mouse.c = i;
+              break;
+            }
+          }
+
+        }
+
+        break;
+      case 3: //enter
+
+        break;
+      case 4: //break
+
+        break;
+      case 5: //move
+
+        break;
+      default:
+    }
+  }
+});
+
+
+// 마우스 업
+hBuffer.addEventListener('mouseup', function(event){
+  //우클릭시
+  if((event.button == 2) || (event.which == 3)){
+    //console.log(event.button, event.which);
+  }
+  else if((event.button == 0) || (event.which == 1)){
+    switch (mouseFlist[mouse.f]){
+      case 2: //catch
+        mouse.c = -1;
+        break;
+      case 5: //move
+
+        break;
+      default:
+    }
   }
 });
 
 // 클릭 시
 hBuffer.addEventListener('click', function(event){
-  switch (mouseFlist[mouse.f]) {
-    case 0:
-      // add
 
-      let c = new circle(random(10.0,30.0));
-      let indexB = Scene.add(c, mouse.x, mouse.y);
-      // 기본
-      Scene.bodies[indexB].material = userMaterial;
-      Scene.bodies[indexB].initialize();
-      break;
-    case 1:
-      //del
-
-      break;
-    case 2:
-      //catch
-
-      break;
-    case 3:
-      //enter
-
-      break;
-    case 4:
-      //break
-
-      break;
-    case 5:
-      //move
-
-      break;
-    default:
-
-  }
 
 });
 
