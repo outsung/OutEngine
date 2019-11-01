@@ -556,6 +556,7 @@ body.prototype.applyForce = function(f){
 
 // 충격량 적용
 body.prototype.applyImpulse = function(impulse, contactVector){
+  //console.log(impulse);
   this.velocity = new vector2(this.velocity.x + this.im * impulse.x,
                               this.velocity.y + this.im * impulse.y);
   this.angularVelocity += this.iI * crossVV(contactVector, impulse);
@@ -587,7 +588,7 @@ body.prototype.integrateForces = function(dt){
   if(this.im == 0.0){
     return;
   }
-
+  //console.log(dt/2.0);
   this.velocity.set(this.velocity.x +
             (this.force.x * this.im + gravity.x) * (dt / 2.0),
                     this.velocity.y +
@@ -1335,7 +1336,7 @@ scene.prototype.step = function(){
 
   // Clear all forces
   for(let i = 0; i < size(this.bodies); ++i){
-    this.bodies[i].force.set(0, 0);
+    this.bodies[i].force.set(0,0);
     this.bodies[i].torque = 0;
   }
 
@@ -1362,6 +1363,7 @@ scene.prototype.add = function(shape, x, y){
 }
 
 scene.prototype.clear = function(){
+
   this.bodies = {};
   this.contacts = {};
   this.delete = [];
