@@ -2,7 +2,25 @@
 //--------------------------------------------------------------------------HTML
 let hUserscreen = document.getElementById("userscreen");
 let hBuffer = document.getElementById("buffer");
+
 //let hScroll = document.getElementsByClassName("scroll")[0];
+
+let ui = {
+  scale : 100,
+
+  tabmenu : {
+    width : 0,
+    height : 0
+  },
+
+  tabmenuCheck : false,
+  hFilter : document.getElementById("filter"),
+  hTabbutton : document.getElementsByClassName("uibutton")[2],
+  hMouseR : document.getElementsByClassName("uibutton")[0],
+  hMouseL : document.getElementsByClassName("uibutton")[1],
+  hTabmenu : document.getElementById("tabmenu")
+
+}
 
 let buffers = {
   0 : document.getElementById("buffer1"),
@@ -32,8 +50,6 @@ let userMaterial = "SuperBall";
 
 
 function resize(){
-  let hUserScreen = document.getElementById("userscreen");
-
   //console.log('Resizing...')
 
   //userScreen.width = window.innerWidth;
@@ -47,8 +63,36 @@ function resize(){
   hBuffer.style.marginLeft = camera.position.x + "px";
   hBuffer.style.marginTop = camera.position.y + "px";
 
-  hUserScreen.style.width = window.innerWidth + "px";
-  hUserScreen.style.height = window.innerHeight + "px";
+  hUserscreen.style.width = window.innerWidth + "px";
+  hUserscreen.style.height = window.innerHeight + "px";
+
+
+  // UI
+
+
+  ui.hTabmenu.style.height = window.innerHeight + "px";
+  ui.hTabmenu.style.width = Math.round(window.innerWidth / 4) + "px";
+
+  ui.hTabmenu.style.marginLeft = ui.tabmenuCheck == true ?
+                          window.innerWidth - Math.round(window.innerWidth / 4) + "px":
+                          window.innerWidth + "px";
+
+  ui.hTabbutton.style.marginTop = Math.round((window.innerHeight - ui.scale) / 2) + "px";
+  //console.log(ui.hTabmenu.style.width);
+  ui.hTabbutton.style.marginLeft = ui.tabmenuCheck == true ?
+        window.innerWidth - Math.round(window.innerWidth / 4) - ui.scale / 2 + "px":
+        window.innerWidth - ui.scale / 2 + "px";
+
+  ui.hMouseR.style.marginTop = Math.round(window.innerHeight / 8 * 6) + "px";
+  ui.hMouseR.style.marginLeft = Math.round(window.innerWidth + ui.scale) / 2 + "px";
+
+  ui.hMouseL.style.marginTop = Math.round(window.innerHeight / 8 * 6) + "px";
+  ui.hMouseL.style.marginLeft = Math.round((window.innerWidth - ui.scale * 3) / 2) + "px";
+
+
+  ui.hFilter.style.width = window.innerWidth + "px";
+  ui.hFilter.style.height = window.innerHeight + "px";
+
 };
 
 
@@ -549,10 +593,6 @@ function mouseF(f1, f2){
 
 //
 let mouse = {
-  f : "catch",
-  c : -1,
-  m : 0,
-
   x : 0,
   y : 0,
   R : mouseF("add","circle"),
@@ -608,55 +648,11 @@ hBuffer.addEventListener('mousemove', function(event){
 hBuffer.addEventListener('mousedown', function(event){
   // 우클릭시
   if((event.button == 2) || (event.which == 3)){
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 0: // add
-        break;
-      case 1: //del
-        break;
-      case 2: //catch
-        mouse.c = -1;
-        break;
-      case 3: //enter
-
-        break;
-      case 4: //break
-
-        break;
-      case 5: //move
-        //원점으로
-        break;
-      default:
-    }
-    */
     //console.log(mouse.R);
     mouse.R("down");
   }
   else if((event.button == 0) || (event.which == 1)){
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 0: // add
 
-        break;
-      case 1: //del
-
-        break;
-      case 2: //catch
-
-
-        break;
-      case 3: //enter
-
-        break;
-      case 4: //break
-
-        break;
-      case 5: //move
-
-        break;
-      default:
-    }
-    */
     mouse.L("down");
   }
 
@@ -668,32 +664,9 @@ hBuffer.addEventListener('mouseup', function(event){
   //우클릭시
   if((event.button == 2) || (event.which == 3)){
     mouse.R("up");
-    //console.log(event.button, event.which);
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 2: //catch
-        mouse.c = -1;
-        break;
-      case 5: //move
-
-        break;
-      default:
-    }
-    */
   }
   else if((event.button == 0) || (event.which == 1)){
     mouse.L("up");
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 2: //catch
-        mouse.c = -1;
-        break;
-      case 5: //move
-
-        break;
-      default:
-    }
-    */
   }
 
 });
@@ -703,32 +676,30 @@ hBuffer.addEventListener('mouseup', function(event){
 hUserscreen.addEventListener('mouseup', function(event){
   if((event.button == 2) || (event.which == 3)){
     mouse.R("up");
-    //console.log(event.button, event.which);
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 2: //catch
-        mouse.c = -1;
-        break;
-      case 5: //move
-
-        break;
-      default:
-    }
-    */
   }
   else if((event.button == 0) || (event.which == 1)){
     mouse.L("up");
-    /*
-    switch (mouseFlist[mouse.f]){
-      case 2: //catch
-        mouse.c = -1;
-        break;
-      case 5: //move
+  }
+});
 
-        break;
-      default:
-    }
-    */
+
+
+ui.hTabbutton.addEventListener('click', function(){
+  // 메뉴 펼침
+  if(ui.tabmenuCheck == false){
+    //console.log(ui.hTabmenu.style.width);
+    ui.tabmenuCheck = true;
+    ui.hTabbutton.style.marginLeft =
+        window.innerWidth - Math.round(window.innerWidth / 4) - ui.scale / 2 + "px";
+    ui.hTabmenu.style.marginLeft = window.innerWidth - Math.round(window.innerWidth / 4) + "px";
+    ui.hFilter.style.visibility = "visible";
+  }
+  else{
+    console.log("false" + window.innerWidth + "px");
+    ui.tabmenuCheck = false;
+    ui.hTabbutton.style.marginLeft = window.innerWidth - ui.scale / 2 + "px";
+    ui.hTabmenu.style.marginLeft = window.innerWidth + "px";
+    ui.hFilter.style.visibility = "hidden";
   }
 });
 

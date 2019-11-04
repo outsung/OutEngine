@@ -48,35 +48,53 @@ body{
 }
 */
 
-#mouseL{
-  width: 100px;
-  height: 100px;
 
-  border: 3px solid red;
-
-  border-radius: 100px;
-
+#filter{
+  z-index: 5;
+  position: absolute;
+  visibility: hidden;
+  background-color: black;
+  opacity: 0.5;
 }
 
-#mouseR{
-  width: 100px;
-  height: 100px;
 
-  border: 3px solid red;
+.uibutton{
+  z-index: 6;
+  position: absolute;
 
-  border-radius: 100px;
-}
-
-#tapbutton{
   width: 100px;
   height: 100px ;
 
   border: 3px solid green;
-
+  background-color: #FF6CC4;
   border-radius: 100px;
-
 }
 
+
+#tabmenu{
+  z-index: 7;
+  position: absolute;
+  background-color: #D697FF;
+}
+
+#scroll{
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#scroll div{
+  margin-top: 0px;
+  background-color: #6B4C7F;
+}
+
+#scroll div div{
+  margin-top: 100px;
+  display: inline-block;
+  background-color: #FF5C30;
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
+}
 
 
 #userscreen{
