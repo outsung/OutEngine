@@ -1,4 +1,9 @@
 
+* {
+  list-style-type:none;
+  margin: 0px;
+  border: 0px;
+}
 
 div{
   border: 0px solid green;
@@ -55,6 +60,7 @@ body{
   visibility: hidden;
   background-color: black;
   opacity: 0.5;
+  transition: all 0.2s;
 }
 
 
@@ -65,16 +71,55 @@ body{
   width: 100px;
   height: 100px ;
 
-  border: 3px solid green;
-  background-color: #FF6CC4;
+  border: 3px solid black;
+  background-color: #FFFFFF;
   border-radius: 100px;
+  transition: all 0.2s;
+
+  overflow: hidden;
+}
+
+.uibutton img{
+  position: absolute;
+}
+
+.uibutton:after{
+  position: absolute;
+  font-size: 20px;
+  content:'';
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  text-align:center;
+  z-index: 3;
+  color: black;
+  transform: scale(1.3);
+}
+
+.uibutton:before{
+  position: absolute;
+  content:'';
+  width: 100px;
+  height: 100px;
+  z-index: 3;
+  opacity: 0.5;
+  background-color: white;
+  transform: scale(1.3);
 }
 
 
+#R:after{content:'R';}
+#L:after{content:'L';}
+
+#tabmenubuttonOn:after{content:'>'; font-size: 30px; margin: -2px 0px 0px -25px;}
+#tabmenubutton:after{content:'<'; font-size: 30px; margin: -2px 0px 0px -25px;}
+
 #tabmenu{
+  visibility: hidden;
   z-index: 7;
   position: absolute;
-  background-color: #D697FF;
+  background-color: #D4D4D4;
+  transition: all 0.2s;
 }
 
 #scroll{
@@ -82,18 +127,105 @@ body{
   overflow-x: hidden;
 }
 
-#scroll div{
-  margin-top: 0px;
+#scroll ul{
+  padding: 0px;
+}
+#scroll ul li{
+  margin: 20px 25px 20px 20px;
+  /*
+  background-color: gray;
+  */
+  float: left;
+}
+#scroll ul li h3{
+  display: block;
+  /*
+  margin: 10px 0px 0px 0px;
+  background-color: red;
+  display: block;
+  -*/
+}
+#scroll ul li ul{
+  float: left;
+  background-color: gray;
+  border-radius: 50px;
+  /*
+  float:left;
+  margin: 20px 35px 10px 20px;
   background-color: #6B4C7F;
+  border-radius: 50px;
+  */
 }
 
-#scroll div div{
-  margin-top: 100px;
-  display: inline-block;
+#scroll ul li ul li{
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
+  background-color: white;
+  margin: 15px 10px 15px 10px;
+  float: left;
+  overflow: visible;
+  position: relative;
+  overflow: hidden;
+  /*
+  line-height: 100px;
+  text-align:center;
+  margin: 0px 10px 10px 10px;
   background-color: #FF5C30;
   width: 100px;
   height: 100px;
   border-radius: 100px;
+  */
+}
+
+
+#scroll ul li ul li:after{
+  font-size: 15px;
+  content:'';
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  text-align:center;
+  z-index: 2;
+  position: absolute;
+  background-color: black;
+  opacity: 0.7;
+  color: white;
+  border-radius: 100px;
+  transform: scale(1.3);
+  transition: all 0.5s;
+}
+
+#scroll ul li ul li.Rock:after{content:'Rock';}
+#scroll ul li ul li.Wood:after{content:'Wood';}
+#scroll ul li ul li.Metal:after{content:'Metal';}
+#scroll ul li ul li.BouncyBall:after{content:'BouncyBall';}
+#scroll ul li ul li.SuperBall:after{content:'SuperBall';}
+#scroll ul li ul li.Pillow:after{content:'Pillow';}
+#scroll ul li ul li.Static:after{content:'Static';}
+
+#scroll ul li ul li.circle:after{content:'circle';}
+#scroll ul li ul li.polygon:after{content:'polygon';}
+
+#scroll ul li ul li.one:after{content:'one';}
+#scroll ul li ul li.all:after{content:'all';}
+
+#scroll ul li ul li.connect:after{content:'connect';}
+#scroll ul li ul li.quit:after{content:'quit';}
+
+#scroll ul li ul li.basic:after{content:'basic';}
+#scroll ul li ul li.reset:after{content:'reset';}
+
+
+#scroll ul li ul li:hover:after{
+  transform: scale(0.0);
+}
+
+#scroll ul li ul li img{
+  z-index: 1;
+  position: absolute;
+  width: 100px;
+  height: 100px;
 }
 
 

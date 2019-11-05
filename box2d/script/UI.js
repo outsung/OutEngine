@@ -10,7 +10,35 @@ let ui = {
 
   tabmenu : {
     width : 0,
-    height : 0
+    height : 0,
+    h : {
+      material : {
+          Rock : document.getElementsByClassName("Rock")[0],
+          Wood : document.getElementsByClassName("Wood")[0],
+          Metal : document.getElementsByClassName("Metal")[0],
+          BouncyBall : document.getElementsByClassName("BouncyBall")[0],
+          SuperBall : document.getElementsByClassName("SuperBall")[0],
+          Pillow : document.getElementsByClassName("Pillow")[0],
+          Static : document.getElementsByClassName("Static")[0]
+      },
+      add : {
+        circle : document.getElementsByClassName("circle")[0],
+        polygon : document.getElementsByClassName("polygon")[0]
+      },
+      del : {
+        one : document.getElementsByClassName("one")[0],
+        all : document.getElementsByClassName("all")[0]
+      },
+      catch : {
+        one : document.getElementsByClassName("one")[1],
+        connect : document.getElementsByClassName("connect")[0],
+        quit : document.getElementsByClassName("quit")[0]
+      },
+      move : {
+        basic : document.getElementsByClassName("basic")[0],
+        reset : document.getElementsByClassName("reset")[0]
+      }
+    }
   },
 
   tabmenuCheck : false,
@@ -18,9 +46,12 @@ let ui = {
   hTabbutton : document.getElementsByClassName("uibutton")[2],
   hMouseR : document.getElementsByClassName("uibutton")[0],
   hMouseL : document.getElementsByClassName("uibutton")[1],
-  hTabmenu : document.getElementById("tabmenu")
+  hTabmenu : document.getElementById("tabmenu"),
+  hScroll : document.getElementById("scroll"),
 
 }
+
+
 
 let buffers = {
   0 : document.getElementById("buffer1"),
@@ -69,13 +100,19 @@ function resize(){
 
   // UI
 
-
   ui.hTabmenu.style.height = window.innerHeight + "px";
   ui.hTabmenu.style.width = Math.round(window.innerWidth / 4) + "px";
 
   ui.hTabmenu.style.marginLeft = ui.tabmenuCheck == true ?
                           window.innerWidth - Math.round(window.innerWidth / 4) + "px":
                           window.innerWidth + "px";
+
+
+
+  ui.hScroll.style.height = window.innerHeight + "px";
+  ui.hScroll.style.width = Math.round(window.innerWidth / 4) + 30 + "px";
+
+
 
   ui.hTabbutton.style.marginTop = Math.round((window.innerHeight - ui.scale) / 2) + "px";
   //console.log(ui.hTabmenu.style.width);
@@ -92,6 +129,7 @@ function resize(){
 
   ui.hFilter.style.width = window.innerWidth + "px";
   ui.hFilter.style.height = window.innerHeight + "px";
+
 
 };
 
@@ -595,8 +633,17 @@ function mouseF(f1, f2){
 let mouse = {
   x : 0,
   y : 0,
-  R : mouseF("add","circle"),
-  L : mouseF("add","polygon"),
+  r : {
+    f1 : "add",
+    f2 : "circle"
+  },
+  l : {
+    f1 : "add",
+    f2 : "polygon"
+  },
+
+  Rfunc : mouseF("add", "circle"),
+  Lfunc : mouseF("add", "polygon"),
 
   hCatch : [],
   catch : [],
@@ -649,11 +696,11 @@ hBuffer.addEventListener('mousedown', function(event){
   // 우클릭시
   if((event.button == 2) || (event.which == 3)){
     //console.log(mouse.R);
-    mouse.R("down");
+    mouse.Rfunc("down");
   }
   else if((event.button == 0) || (event.which == 1)){
 
-    mouse.L("down");
+    mouse.Lfunc("down");
   }
 
 });
@@ -663,10 +710,10 @@ hBuffer.addEventListener('mousedown', function(event){
 hBuffer.addEventListener('mouseup', function(event){
   //우클릭시
   if((event.button == 2) || (event.which == 3)){
-    mouse.R("up");
+    mouse.Rfunc("up");
   }
   else if((event.button == 0) || (event.which == 1)){
-    mouse.L("up");
+    mouse.Lfunc("up");
   }
 
 });
@@ -675,33 +722,99 @@ hBuffer.addEventListener('mouseup', function(event){
 // canvas 넘어가고 마우스 up 할 때
 hUserscreen.addEventListener('mouseup', function(event){
   if((event.button == 2) || (event.which == 3)){
-    mouse.R("up");
+    mouse.Rfunc("up");
   }
   else if((event.button == 0) || (event.which == 1)){
-    mouse.L("up");
+    mouse.Lfunc("up");
   }
 });
 
 
-
+// 탭 메뉴 버튼 눌렀을때
 ui.hTabbutton.addEventListener('click', function(){
   // 메뉴 펼침
   if(ui.tabmenuCheck == false){
     //console.log(ui.hTabmenu.style.width);
     ui.tabmenuCheck = true;
+    ui.hTabbutton.id = "tabmenubuttonOn";
+    ui.hTabmenu.style.visibility = "visible";
     ui.hTabbutton.style.marginLeft =
         window.innerWidth - Math.round(window.innerWidth / 4) - ui.scale / 2 + "px";
     ui.hTabmenu.style.marginLeft = window.innerWidth - Math.round(window.innerWidth / 4) + "px";
     ui.hFilter.style.visibility = "visible";
   }
   else{
-    console.log("false" + window.innerWidth + "px");
+    //console.log("false" + window.innerWidth + "px");
     ui.tabmenuCheck = false;
+    ui.hTabbutton.id = "tabmenubutton";
+    ui.hTabmenu.style.visibility = "hidden";
     ui.hTabbutton.style.marginLeft = window.innerWidth - ui.scale / 2 + "px";
     ui.hTabmenu.style.marginLeft = window.innerWidth + "px";
     ui.hFilter.style.visibility = "hidden";
   }
 });
+
+
+
+
+// 마우스 R L 이미지 & 기능 바꾸기
+function mouseRLChange(){
+  //console.log("mouseRLChange");
+  let hMouseRimg = ui.hMouseR.childNodes[1];
+  let hMouseLimg = ui.hMouseL.childNodes[1];
+
+  console.log(hMouseLimg);
+
+  hMouseRimg.src = "../image/" + mouse.r.f1 + "_" + mouse.r.f2 + ".png";
+  hMouseLimg.src = "../image/" + mouse.l.f1 + "_" + mouse.l.f2 + ".png";
+
+  //console.log(mouse.r.f1 +"_"+ mouse.r.f2);
+  mouse.Rfunc = mouseF(mouse.r.f1, mouse.r.f2);
+  mouse.Lfunc = mouseF(mouse.l.f1, mouse.l.f2);
+
+}
+
+
+//console.log(ui.tabmenu.h);
+
+// 탭 메뉴에 있는 요소 눌렀을때
+for(let i = 0; i < size(Object.keys(ui.tabmenu.h)); ++i){
+  let child = ui.tabmenu.h[Object.keys(ui.tabmenu.h)[i]];
+  //console.log(child);
+  for(let j = 0; j < size(Object.keys(child)); ++j){
+    let button = child[Object.keys(child)[j]];
+    //console.log(button);
+    button.addEventListener('mousedown', function(){
+      //우클릭
+      if((event.button == 2) || (event.which == 3)){
+        //console.log("우클릭");
+        if(Object.keys(ui.tabmenu.h)[i] == "material"){
+          //console.log("material 클릭");
+          userMaterial = Object.keys(child)[j];
+        }
+        else{
+          mouse.r.f1 = Object.keys(ui.tabmenu.h)[i];
+          mouse.r.f2 = Object.keys(child)[j];
+        }
+      }
+      //좌클릭
+      else if((event.button == 0) || (event.which == 1)){
+        //console.log("좌클릭");
+        if(Object.keys(ui.tabmenu.h)[i] == "material"){
+          //console.log("material 클릭");
+          userMaterial = Object.keys(child)[j];
+          //console.log(userMaterial);
+        }
+        else{
+          mouse.l.f1 = Object.keys(ui.tabmenu.h)[i];
+          mouse.l.f2 = Object.keys(child)[j];
+        }
+      }
+
+      mouseRLChange();
+    });
+  }
+}
 
 
 
