@@ -6,7 +6,20 @@
     <link rel="stylesheet" href="../css/start.css">
   </head>
   <body onresize="resize()" onkeydown="keyPress()" onkeyup="keyUp()">
-
+    <div id="input">
+      <h1>New</h1>
+      <div id="textbox">
+        <div id="inputWidth">
+          <label>Width</label>
+          <input type="text" onfocus="inputFocusOn(this)" onfocusout="inputFocusOut(this)">
+        </div>
+        <div id="inputHeight">
+          <label>Height</label>
+          <input type="text" onfocus="inputFocusOn(this)" onfocusout="inputFocusOut(this)">
+        </div>
+        <button onclick="setBufferSize()">확인</button>
+      </div>
+    </div>
     <!-- 캐릭터 설정 -->
     <!--
     <div class="scroll">

@@ -6,6 +6,7 @@ let hBuffer = document.getElementById("buffer");
 //let hScroll = document.getElementsByClassName("scroll")[0];
 
 let ui = {
+  inputCheck : true,
   scale : 100,
 
   tabmenu : {
@@ -61,16 +62,63 @@ let buffers = {
 
 //"title ? char ? play ?
 //let check = "title";
+let width = 0;
+let height = 0;
 
-const width = 2000;
-const height = 2000;
+function inputFocusOn(me){
+  let parent = me.parentNode;
+  console.log(parent);
+  let label = parent.childNodes[1];
+  console.log(parent.childNodes);
+  label.style.opacity = 0.0;
+}
+
+function inputFocusOut(me){
+  let parent = me.parentNode;
+  console.log(parent);
+  let label = parent.childNodes[1];
+  console.log(parent.childNodes);
+  if(me.value == ''){
+    label.style.opacity = 1.0;
+  }
+}
+function setBufferSize(){
+  let hInput = document.getElementById("input");
+  console.log("setBufferSize");
+
+
+  let hTextbox = document.getElementById("textbox");
+  let hInputWidth = document.getElementById("inputWidth");
+  let hInputHeight = document.getElementById("inputHeight");
+
+  console.log(hInputWidth.value , hInputHeight.value);
+  if(hInputWidth.value == "" || hInputHeight.value == ""){
+    return 0;
+  }
+  width = clamp(300, 3000, hInputWidth.value);
+  height = clamp(300, 3000, hInputHeight.value);
+
+  console.log(width, height);
+  if(typeof width == "undefined" || typeof height == "undefined"){
+    return 0;
+  }
+
+  camera.position.x = -(width - window.innerWidth) / 2,
+  camera.position.y = -(height - window.innerHeight) / 2
+
+  hInput.style.display = "none";
+
+  ui.inputCheck = false;
+  bufferInit();
+}
+
 
 //console.log(width / 2 - window.innerWidth/2);
 
 let camera = {
   position : {
-    x : -(width - window.innerWidth) / 2,
-    y : -(height - window.innerHeight) / 2
+    x : 0,
+    y : 0
   },
   scale : 1.0,
   lineWidth : 1.0
@@ -81,6 +129,25 @@ let userMaterial = "SuperBall";
 
 
 function resize(){
+  if(ui.inputCheck == true){
+    let hInput = document.getElementById("input");
+    let hTextbox = document.getElementById("textbox");
+    //console.log(hInput.childNodes);
+    let hH1 = hInput.childNodes[1];
+    hInput.style.width = window.innerWidth + "px";
+    hInput.style.height = window.innerHeight + "px";
+
+    /*
+    hTextbox.style.width = Math.floor(window.innerWidth / 2) + "px";
+    hTextbox.style.height = Math.floor(window.innerHeight / 2) + "px";
+    */
+
+    hTextbox.style.marginLeft = Math.floor((window.innerWidth - 300) / 2) + "px";
+    hTextbox.style.marginTop = Math.floor((window.innerHeight - 250) / 2) + "px";
+    hH1.style.marginTop = Math.floor((window.innerWidth - 300) / 2) - 43 + "px";
+
+
+  }
   //console.log('Resizing...')
 
   //userScreen.width = window.innerWidth;
@@ -120,10 +187,10 @@ function resize(){
         window.innerWidth - Math.round(window.innerWidth / 4) - ui.scale / 2 + "px":
         window.innerWidth - ui.scale / 2 + "px";
 
-  ui.hMouseR.style.marginTop = Math.round(window.innerHeight / 8 * 6) + "px";
+  ui.hMouseR.style.marginTop = Math.round(window.innerHeight / 8 * 7) + "px";
   ui.hMouseR.style.marginLeft = Math.round(window.innerWidth + ui.scale) / 2 + "px";
 
-  ui.hMouseL.style.marginTop = Math.round(window.innerHeight / 8 * 6) + "px";
+  ui.hMouseL.style.marginTop = Math.round(window.innerHeight / 8 * 7) + "px";
   ui.hMouseL.style.marginLeft = Math.round((window.innerWidth - ui.scale * 3) / 2) + "px";
 
 
@@ -132,6 +199,7 @@ function resize(){
 
 
 };
+
 
 
 //------------------------------------------------------------------------buffer
@@ -341,7 +409,7 @@ scene.prototype.render = function(){
 
 //------------------------------------------------------------------------------ init
 
-bufferInit();
+//  bufferInit();
 resize();
 
 
@@ -354,7 +422,7 @@ let canStep = true;
 let accumulator = 0;
 
 main();
-
+//main();
 function PhysicsLoop(){
   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
