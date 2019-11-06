@@ -44,9 +44,12 @@ let ui = {
 
   tabmenuCheck : false,
   hFilter : document.getElementById("filter"),
-  hTabbutton : document.getElementsByClassName("uibutton")[2],
+
+  hTabbutton : document.getElementsByClassName("uibutton")[3],
   hMouseR : document.getElementsByClassName("uibutton")[0],
   hMouseL : document.getElementsByClassName("uibutton")[1],
+  hMaterial : document.getElementsByClassName("uibutton")[2],
+
   hTabmenu : document.getElementById("tabmenu"),
   hScroll : document.getElementById("scroll"),
 
@@ -62,22 +65,22 @@ let buffers = {
 
 //"title ? char ? play ?
 //let check = "title";
-let width = 0;
-let height = 0;
+let width = -1;
+let height = -1;
 
 function inputFocusOn(me){
   let parent = me.parentNode;
-  console.log(parent);
+  //console.log(parent);
   let label = parent.childNodes[1];
-  console.log(parent.childNodes);
+  //console.log(parent.childNodes);
   label.style.opacity = 0.0;
 }
 
 function inputFocusOut(me){
   let parent = me.parentNode;
-  console.log(parent);
+  //console.log(parent);
   let label = parent.childNodes[1];
-  console.log(parent.childNodes);
+  //console.log(parent.childNodes);
   if(me.value == ''){
     label.style.opacity = 1.0;
   }
@@ -88,17 +91,17 @@ function setBufferSize(){
 
 
   let hTextbox = document.getElementById("textbox");
-  let hInputWidth = document.getElementById("inputWidth");
-  let hInputHeight = document.getElementById("inputHeight");
+  let hInputWidth = document.getElementById("inputWidth").childNodes[3];
+  let hInputHeight = document.getElementById("inputHeight").childNodes[3];
 
-  console.log(hInputWidth.value , hInputHeight.value);
+  //console.log(hInputWidth , hInputHeight);
   if(hInputWidth.value == "" || hInputHeight.value == ""){
     return 0;
   }
   width = clamp(300, 3000, hInputWidth.value);
   height = clamp(300, 3000, hInputHeight.value);
 
-  console.log(width, height);
+  //console.log(width, height);
   if(typeof width == "undefined" || typeof height == "undefined"){
     return 0;
   }
@@ -110,7 +113,10 @@ function setBufferSize(){
 
   ui.inputCheck = false;
   bufferInit();
+  resize();
+  main();
 }
+
 
 
 //console.log(width / 2 - window.innerWidth/2);
@@ -134,6 +140,7 @@ function resize(){
     let hTextbox = document.getElementById("textbox");
     //console.log(hInput.childNodes);
     let hH1 = hInput.childNodes[1];
+
     hInput.style.width = window.innerWidth + "px";
     hInput.style.height = window.innerHeight + "px";
 
@@ -144,7 +151,9 @@ function resize(){
 
     hTextbox.style.marginLeft = Math.floor((window.innerWidth - 300) / 2) + "px";
     hTextbox.style.marginTop = Math.floor((window.innerHeight - 250) / 2) + "px";
-    hH1.style.marginTop = Math.floor((window.innerWidth - 300) / 2) - 43 + "px";
+
+    hH1.style.marginLeft = Math.floor((window.innerWidth - 300) / 2)+43 + "px";
+    hH1.style.marginTop = Math.floor((window.innerHeight - 250) / 2) - 43 + "px";
 
 
   }
@@ -193,6 +202,8 @@ function resize(){
   ui.hMouseL.style.marginTop = Math.round(window.innerHeight / 8 * 7) + "px";
   ui.hMouseL.style.marginLeft = Math.round((window.innerWidth - ui.scale * 3) / 2) + "px";
 
+  ui.hMaterial.style.marginTop = Math.round(window.innerHeight / 16 * 13) + "px";
+  ui.hMaterial.style.marginLeft = Math.round((window.innerWidth - 80) / 2) + "px";
 
   ui.hFilter.style.width = window.innerWidth + "px";
   ui.hFilter.style.height = window.innerHeight + "px";
@@ -421,7 +432,7 @@ let frameStepping = true;
 let canStep = true;
 let accumulator = 0;
 
-main();
+//main();
 //main();
 function PhysicsLoop(){
   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -481,6 +492,25 @@ function main(){
 
   return 0;
 }
+
+
+
+//------------------------------------------------------------------------- init
+
+if(width !== -1 || height !== -1){
+  let hInput = document.getElementById("input");
+
+  camera.position.x = -(width - window.innerWidth) / 2,
+  camera.position.y = -(height - window.innerHeight) / 2
+
+  hInput.style.display = "none";
+
+  ui.inputCheck = false;
+  bufferInit();
+  resize();
+  main();
+}
+
 
 
 //-------------------------------------------------------------------------mouse
@@ -826,19 +856,78 @@ ui.hTabbutton.addEventListener('click', function(){
 
 
 // 마우스 R L 이미지 & 기능 바꾸기
-function mouseRLChange(){
+function mouseRLChange(rAndl){
   //console.log("mouseRLChange");
   let hMouseRimg = ui.hMouseR.childNodes[1];
   let hMouseLimg = ui.hMouseL.childNodes[1];
 
-  console.log(hMouseLimg);
+  let hMaterialimg = ui.hMaterial.childNodes[1];
+  //console.log(hMouseLimg);
 
-  hMouseRimg.src = "../image/" + mouse.r.f1 + "_" + mouse.r.f2 + ".png";
-  hMouseLimg.src = "../image/" + mouse.l.f1 + "_" + mouse.l.f2 + ".png";
+  if(rAndl === "m"){
+    let t = 0;
+    let hButtonMove = setInterval(function(){
+      if(t <= 8){
+        if(t % 2 == 0){
+          ui.hMaterial.style.left = (8 - t) + "px";
+        }
+        else{
+          ui.hMaterial.style.left = -(8 - t) + "px";
+        }
+        t++;
+      }
+      else{
+        clearInterval(hButtonMove);
+      }
+
+    },50);
+
+    hMaterialimg.src = "../image/" + userMaterial + ".png";
+  }
+  else if(rAndl === "r"){
+    let t = 0;
+    let hButtonMove = setInterval(function(){
+      if(t <= 8){
+        if(t % 2 == 0){
+          ui.hMouseR.style.left = (8 - t) + "px";
+        }
+        else{
+          ui.hMouseR.style.left = -(8 - t) + "px";
+        }
+        t++;
+      }
+      else{
+        clearInterval(hButtonMove);
+      }
+
+    },50);
+
+    hMouseRimg.src = "../image/" + mouse.r.f1 + "_" + mouse.r.f2 + ".png";
+    mouse.Rfunc = mouseF(mouse.r.f1, mouse.r.f2);
+  }
+  else{
+    let t = 0;
+    let hButtonMove = setInterval(function(){
+      if(t <= 8){
+        if(t % 2 == 0){
+          ui.hMouseL.style.left = (8 - t) + "px";
+        }
+        else{
+          ui.hMouseL.style.left = -(8 - t) + "px";
+        }
+        t++;
+      }
+      else{
+        clearInterval(hButtonMove);
+      }
+
+    },50);
+
+    hMouseLimg.src = "../image/" + mouse.l.f1 + "_" + mouse.l.f2 + ".png";
+    mouse.Lfunc = mouseF(mouse.l.f1, mouse.l.f2);
+  }
 
   //console.log(mouse.r.f1 +"_"+ mouse.r.f2);
-  mouse.Rfunc = mouseF(mouse.r.f1, mouse.r.f2);
-  mouse.Lfunc = mouseF(mouse.l.f1, mouse.l.f2);
 
 }
 
@@ -853,16 +942,39 @@ for(let i = 0; i < size(Object.keys(ui.tabmenu.h)); ++i){
     let button = child[Object.keys(child)[j]];
     //console.log(button);
     button.addEventListener('mousedown', function(){
+
+      let t = 0;
+      //흔들림 이벤트
+      let hButtonMove = setInterval(function(){
+        if(t <= 8){
+          if(t % 2 == 0){
+            button.style.left = (8 - t) + "px";
+          }
+          else{
+            button.style.left = -(8 - t) + "px";
+          }
+          t++;
+        }
+        else{
+          clearInterval(hButtonMove);
+        }
+
+      },50);
+
+      let rAndl = "";
+
       //우클릭
       if((event.button == 2) || (event.which == 3)){
         //console.log("우클릭");
         if(Object.keys(ui.tabmenu.h)[i] == "material"){
           //console.log("material 클릭");
           userMaterial = Object.keys(child)[j];
+          rAndl = "m";
         }
         else{
           mouse.r.f1 = Object.keys(ui.tabmenu.h)[i];
           mouse.r.f2 = Object.keys(child)[j];
+          rAndl = "r";
         }
       }
       //좌클릭
@@ -871,15 +983,17 @@ for(let i = 0; i < size(Object.keys(ui.tabmenu.h)); ++i){
         if(Object.keys(ui.tabmenu.h)[i] == "material"){
           //console.log("material 클릭");
           userMaterial = Object.keys(child)[j];
+          rAndl = "m";
           //console.log(userMaterial);
         }
         else{
           mouse.l.f1 = Object.keys(ui.tabmenu.h)[i];
           mouse.l.f2 = Object.keys(child)[j];
+          rAndl = "l";
         }
       }
 
-      mouseRLChange();
+      mouseRLChange(rAndl);
     });
   }
 }
@@ -912,7 +1026,7 @@ hUserscreen.addEventListener('mousewheel', function(delta){
 
     camera.lineWidth = camera.scale * -12 + 11;
     camera.lineWidth = Math.max(1, camera.lineWidth);
-    console.log(camera.scale , camera.lineWidth);
+    //console.log(camera.scale , camera.lineWidth);
   }
 });
 

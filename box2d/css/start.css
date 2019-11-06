@@ -162,8 +162,8 @@ button:before{
   width: 100px;
   height: 100px ;
 
-  border: 3px solid black;
-  background-color: #FFFFFF;
+  border: 3px solid #7BAEB5;
+  background-color: #629296;
   border-radius: 100px;
   transition: all 0.2s;
 
@@ -198,6 +198,23 @@ button:before{
   transform: scale(1.3);
 }
 
+#M{
+  width: 80px;
+  height: 80px;
+}
+#M img{
+  width: 80px;
+  height: 80px;
+}
+
+#M:after{
+  content:'Material';
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+
+  transform: scale(0.7);
+}
 
 #R:after{content:'R';}
 #L:after{content:'L';}
@@ -209,7 +226,7 @@ button:before{
   visibility: hidden;
   z-index: 7;
   position: absolute;
-  background-color: #D4D4D4;
+  background-color: #72ABB0;
   transition: all 0.2s;
 }
 
@@ -238,7 +255,7 @@ button:before{
 }
 #scroll ul li ul{
   float: left;
-  background-color: gray;
+  background-color: #89C2C9;
   border-radius: 50px;
   /*
   float:left;
