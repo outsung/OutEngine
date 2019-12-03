@@ -177,32 +177,32 @@ function size(a){
 //--------------------------------------------------------------------------init
 const material = {
   Rock : {
-    density : 0.6,
+    density : 0.12,
     restitution : 0.1,
     r : 84, g : 84, b : 84 // 어두운 회색
   },
   Wood : {
-    density : 0.3,
+    density : 0.06,
     restitution : 0.2,
     r : 255, g : 111, b : 28 //주황
   },
   Metal : {
-    density : 1.2,
+    density : 0.24,
     restitution : 0.05,
     r : 156, g : 156, b : 156 // 회색
   },
   BouncyBall : {
-    density : 0.3,
+    density : 0.06,
     restitution : 0.8,
     r : 119, g : 255, b : 91
   },
   SuperBall : {
-    density : 0.3,
+    density : 0.06,
     restitution : 0.995,
     r : 1, g : 65, b : 255
   },
   Pillow : {
-    density : 1.0,
+    density : 0.2,
     restitution : 0.2,
     r : 122, g : 155, b : 148
   },
@@ -212,7 +212,7 @@ const material = {
     r : 100, g : 205, b : 255
   }
 };
-const gravityScale = 5.0;
+const gravityScale = 7.5;
 const gravity = new vector2(0, 10.0 * gravityScale);
 const dt = 1.0 / 60.0;
 //------------------------------------------------------------------------------ clock
@@ -405,7 +405,7 @@ polygonShape.prototype.setBox = function(hw, hh){
 polygonShape.prototype.set = function(vertices, count){
   assert((count > 2) && (count <= this.MaxPolyVertexCount));
   count = Math.min(Math.floor(count), this.MaxPolyVertexCount);
-  console
+  //console
   // 가장 오른쪽 위치 점 찾기
   let rightMost = 0;
   let highestXCoord = vertices[0].x;
